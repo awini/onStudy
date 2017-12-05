@@ -1,2 +1,4 @@
 .idea
 .pyc
+bower_components
+bower.json
