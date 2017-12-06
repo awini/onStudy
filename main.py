@@ -1,47 +1,15 @@
 # coding: utf-8
-from os.path import join, exists, dirname
+from os.path import join, dirname
 
 import tornado.ioloop
 import tornado.web
 
+from handlers.auth import LogoutHandler, LoginHandler
+from handlers.static_handlers import CssHandler, AssetsLibHandler
+from handlers.MainHandler import MainHandler
+
 
 BOWER_COMPONENTS = 'bower_components'
-
-
-class MainHandler(tornado.web.RequestHandler):
-
-    def get(self):
-        return self.render("main.html")
-
-
-class AssetsLibHandler(tornado.web.RequestHandler):
-
-    def get(self, static_type, lib, filename):
-        dist_variants = ()
-        if static_type == "js":
-            dist_variants = ("dist", "dist/js", "dest")
-            self.set_header("Content-Type", "text/js")
-        elif static_type == "css":
-            dist_variants = ("dist/css",)
-            self.set_header("Content-Type", "text/css")
-
-        for dist in dist_variants:
-            fullpath = join(BOWER_COMPONENTS, lib, dist, filename)
-            if exists(fullpath):
-                self.write(open(fullpath).read())
-                return
-        self.send_error(404)
-
-class CssHandler(tornado.web.RequestHandler):
-
-    def get(self, filename):
-        self.set_header("Content-Type", "text/css")
-
-        fullpath = join("template", "css", filename)
-        if exists(fullpath):
-            self.write(open(fullpath).read())
-            return
-        self.send_error(404)
 
 
 def make_app():
@@ -56,6 +24,8 @@ def make_app():
 
     return tornado.web.Application([
         (r"/", MainHandler),
+        (r"/login", LoginHandler),
+        (r"/logout", LogoutHandler),
         (r"/([^/]*)/([^/]*)/([^/]*)", AssetsLibHandler),
         (r"/css/([^/]*)", CssHandler),
     ], **settings)
