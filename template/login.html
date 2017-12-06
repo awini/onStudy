@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap/bootstrap.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="css/jumbotron.css" rel="stylesheet">
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script type="text/javascript" src="js/jquery/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script type="text/javascript" src="js/bootstrap/bootstrap.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row main">
+        <div class="panel-heading">
+            <div class="panel-title text-center">
+                <h1 class="title">Login</h1>
+                <hr />
+            </div>
+        </div>
+        <div class="main-login main-center">
+
+            <form class="form-horizontal" method="post" action="login">
+                {% module xsrf_form_html() %}
+                <div class="form-group">
+                    <label for="username" class="cols-sm-2 control-label">Логин</label>
+                    <div class="cols-sm-10 off">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-users fa" aria-hidden="true"></i></span>
+                            <input type="text" class="form-control" name="username" id="username"  placeholder="Введите Ваш логин" required/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="cols-sm-2 control-label">Пароль</label>
+                    <div class="cols-sm-10 off">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
+                            <input type="password" class="form-control" name="password" id="password"  placeholder="Введите пароль" required/>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden" name="next" value="{{ next }}" />
+                <div class="btn-group-sm">
+                    <button type="submit" class="btn btn-group-sm btn-primary btn-lg btn-block login-button">Войти</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
