@@ -3,3 +3,4 @@ __pycache__/
 .pyc
 bower_components
 bower.json
+*.db
