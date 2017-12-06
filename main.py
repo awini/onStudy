@@ -14,6 +14,7 @@ from sqlalchemy.orm import sessionmaker
 
 from settings import DB_NAME, DB_SCHEME
 
+from DBBridge import DBBridge
 
 class Application(tornado.web.Application):
     def __init__(self):
@@ -36,7 +37,7 @@ class Application(tornado.web.Application):
 
         tornado.web.Application.__init__(self, handlers, **settings)
         engine = create_engine(DB_SCHEME + DB_NAME)
-        self.db = scoped_session(sessionmaker(bind=engine))
+        self.db = DBBridge(scoped_session(sessionmaker(bind=engine)))
 
 
 if __name__ == "__main__":
