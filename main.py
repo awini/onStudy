@@ -9,8 +9,6 @@ from handlers.static_handlers import CssHandler, AssetsLibHandler
 from handlers.MainHandler import MainHandler
 
 
-BOWER_COMPONENTS = 'bower_components'
-
 
 def make_app():
     settings = {
