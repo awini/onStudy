@@ -1,27 +1,26 @@
 from handlers.BaseHandler import BaseHandler
 import tornado.web
 
+from models import get_user
+
 import bcrypt
 
-TST_PASS = b'$2b$12$mjV5cDEl7g6N0xMZcjNwFO5By3CnxCPQH.O1aW/TU9tzcDZUi5bDq'
-TST_USER = 'admin'
 
 class LoginHandler(BaseHandler):
     def get(self):
         self.render('login.html')
 
     def post(self):
-        username = self.get_argument('username')
+        user = get_user(self.application.db, self.get_argument('username'))
+        if not user:
+            self.write('Wrong user/password')
+            return
+
         pw = self.get_argument('password')
-        get_pw = bcrypt.hashpw(pw.encode('utf-8'), TST_PASS)
-        if username != TST_USER:
-            self.write('WRONG LOGIN!')
-            return
-        if get_pw != TST_PASS:
-            self.write('WRONG PASSWORD')
-            return
-        self.set_secure_cookie("user", self.get_argument("username"))
-        self.redirect("/")
+        if check_password(pw, user.password):
+            self.write('User and pass OK')
+        else:
+            self.write('Wrong user/password')
 
 
 class LogoutHandler(BaseHandler):
@@ -29,3 +28,15 @@ class LogoutHandler(BaseHandler):
     def get(self):
         self.clear_cookie("user")
         self.redirect('/')
+
+
+def check_password(user_pw, db_pw):
+    hash_pw = bcrypt.hashpw(user_pw.encode('utf-8'), db_pw.encode('utf-8'))
+    if hash_pw.decode('utf-8') == db_pw:
+        return True
+    else:
+        return False
+
+
+def generate_password(pw):
+    return bcrypt.hashpw(pw.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
