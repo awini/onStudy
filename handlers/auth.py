@@ -9,7 +9,7 @@ class LoginHandler(BaseHandler):
         self.render('login.html')
 
     def post(self):
-        user = self.application.db.get_user(self.get_argument('username'))
+        user = self.dbb.get_user(self.get_argument('username'))
         if not user:
             self.write('Wrong user/password')
             return
