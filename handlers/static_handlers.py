@@ -1,7 +1,7 @@
 from handlers.BaseHandler import BaseHandler
 
 from os.path import join, exists
-
+from settings import BOWER_COMPONENTS
 
 class AssetsLibHandler(BaseHandler):
 
