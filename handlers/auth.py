@@ -1,8 +1,6 @@
 from handlers.BaseHandler import BaseHandler
 import tornado.web
 
-from models import get_user
-
 import bcrypt
 
 
@@ -11,7 +9,7 @@ class LoginHandler(BaseHandler):
         self.render('login.html')
 
     def post(self):
-        user = get_user(self.application.db, self.get_argument('username'))
+        user = self.dbb.get_user(self.get_argument('username'))
         if not user:
             self.write('Wrong user/password')
             return

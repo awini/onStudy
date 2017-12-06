@@ -12,3 +12,6 @@ class BaseHandler(RequestHandler):
         :return: username
         '''
         return self.get_secure_cookie("user")
+
+    def initialize(self, db_bridge):
+        self.dbb = db_bridge

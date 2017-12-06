@@ -14,15 +14,19 @@ from sqlalchemy.orm import sessionmaker
 
 from settings import DB_NAME, DB_SCHEME
 
+from DBBridge import DBBridge
 
 class Application(tornado.web.Application):
     def __init__(self):
+        engine = create_engine(DB_SCHEME + DB_NAME)
+        db_bridge = dict(db_bridge=DBBridge(scoped_session(sessionmaker(bind=engine))))
+
         handlers = [
-            (r"/", MainHandler),
-            (r"/login", LoginHandler),
-            (r"/logout", LogoutHandler),
-            (r"/([^/]*)/([^/]*)/([^/]*)", AssetsLibHandler),
-            (r"/css/([^/]*)", CssHandler),
+            (r"/", MainHandler, db_bridge),
+            (r"/login", LoginHandler, db_bridge),
+            (r"/logout", LogoutHandler, db_bridge),
+            (r"/([^/]*)/([^/]*)/([^/]*)", AssetsLibHandler, db_bridge),
+            (r"/css/([^/]*)", CssHandler, db_bridge),
         ]
 
         settings = {
@@ -35,8 +39,7 @@ class Application(tornado.web.Application):
         }
 
         tornado.web.Application.__init__(self, handlers, **settings)
-        engine = create_engine(DB_SCHEME + DB_NAME)
-        self.db = scoped_session(sessionmaker(bind=engine))
+
 
 
 if __name__ == "__main__":
