@@ -4,3 +4,4 @@ __pycache__/
 bower_components
 bower.json
 *.db
+env
