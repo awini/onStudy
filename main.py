@@ -18,6 +18,7 @@ if __name__ == "__main__" and sets.DEBUG:
     from subprocess import call
     import sys
 
+    call(sys.executable + " -m pip install -r requirements.txt", shell=True)
     call(sys.executable + " " + join("scripts", "install.py"), shell=True)
     call(sys.executable + " " + join("scripts", "init_db.py"), shell=True)
 
