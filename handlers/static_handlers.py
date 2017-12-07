@@ -1,7 +1,7 @@
 from handlers.BaseHandler import BaseHandler
 
 from os.path import join, exists
-from settings import BOWER_COMPONENTS, STATIC_PATH
+from settings import sets
 
 
 class AssetsLibHandler(BaseHandler):
@@ -16,7 +16,7 @@ class AssetsLibHandler(BaseHandler):
             self.set_header("Content-Type", "text/css")
 
         for dist in dist_variants:
-            fullpath = join(BOWER_COMPONENTS, lib, dist, filename)
+            fullpath = join(sets.BOWER_COMPONENTS, lib, dist, filename)
             if exists(fullpath):
                 self.write(open(fullpath).read())
                 return
@@ -28,7 +28,7 @@ class CssHandler(BaseHandler):
     def get(self, filename):
         self.set_header("Content-Type", "text/css")
 
-        fullpath = join(STATIC_PATH, "css", filename)
+        fullpath = join(sets.STATIC_PATH, "css", filename)
         if exists(fullpath):
             self.write(open(fullpath).read())
             return

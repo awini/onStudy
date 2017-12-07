@@ -7,7 +7,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
-import settings as sets
+from settings import sets
+
 from handlers.MainHandler import MainHandler
 from handlers.auth import LogoutHandler, LoginHandler
 from handlers.static_handlers import CssHandler, AssetsLibHandler
@@ -16,6 +17,8 @@ from handlers.static_handlers import CssHandler, AssetsLibHandler
 if __name__ == "__main__" and sets.DEBUG:
     from subprocess import call
     import sys
+
+    call(sys.executable + " " + join("scripts", "install.py"), shell=True)
     call(sys.executable + " " + join("scripts", "init_db.py"), shell=True)
 
 

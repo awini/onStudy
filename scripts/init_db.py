@@ -11,41 +11,41 @@ from sqlalchemy.orm import sessionmaker
 
 from db.models import User, Base
 from handlers.auth import generate_password
-from settings import DB_NAME, DB_SCHEME
+from settings import sets
 
-ENGINE = create_engine(DB_SCHEME + DB_NAME)
+ENGINE = create_engine(sets.DB_SCHEME + sets.DB_NAME)
 
 def create_bd_dir():
-    path = dirname(abspath(DB_NAME))
+    path = dirname(abspath(sets.DB_NAME))
     if not exists(path):
         makedirs(path)
 
 def check_bd_file():
-    return exists(DB_NAME)
+    return exists(sets.DB_NAME)
 
 
 def rm_bd_file():
-    bd_fl = Path(DB_NAME)
+    bd_fl = Path(sets.DB_NAME)
     try:
         bd_fl.unlink()  # remove file
     except Exception as e:
-        print('Error with removing file {}!'.format(DB_NAME))
+        print('Error with removing file {}!'.format(sets.DB_NAME))
         print('Error description: \n {}'.format(e))
         exit()
-    print('File {} was removed'.format(DB_NAME))
+    print('File {} was removed'.format(sets.DB_NAME))
 
 
-def fill_credits():
+def fill_credits(answers):
     print('Fill user credits')
-    username = input('Enter username(admin): ')
+    username = answers["username"] if "username" in answers else input('Enter username(admin): ')
     if not username:
         username = 'admin'
-    email = input('Enter email(admin@admin.ru): ')
+    email = answers["email"] if "email" in answers else input('Enter email(admin@admin.ru): ')
     if not email:
         email = 'admin@admin.ru'
 
     while 1:
-        password = input('Enter password:')
+        password = answers["password"] if "password" in answers else input('Enter password:')
         if password:
             break
         print('Password can`t be empty!')
@@ -62,14 +62,15 @@ def add_user(username, email, password):
     session.commit()
 
 
-if __name__ == '__main__':
-
-    print('Search for file {} in current directory'.format(DB_NAME))
+def prepare_db_dir(answers):
+    print('Search for file {} in current directory'.format(sets.DB_NAME))
     if check_bd_file():
-        user_ans = input('Find file "{}"! Remove it? y/n \n'.format(DB_NAME))
+        user_ans = answers["remove_existed"] if "remove_existed" in answers else input('Find file "{}"! Remove it? y/n \n'.format(sets.DB_NAME))
+
         if 'y' not in user_ans.lower():
             print('Exit program, can not initialize when file exist!')
             exit()
+
         rm_bd_file()
     else:
         print('File not found')
@@ -77,9 +78,16 @@ if __name__ == '__main__':
     create_bd_dir()
 
 
+def reinit_db(answers={}):
+    prepare_db_dir(answers)
+
     print('Start initialize DB')
     Base.metadata.create_all(ENGINE)
 
-    add_user(*fill_credits())
+    add_user(*fill_credits(answers))
 
     print('Success')
+
+
+if __name__ == '__main__':
+    reinit_db()
