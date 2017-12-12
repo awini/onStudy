@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 
 from settings import sets
 
-from handlers.MainHandler import MainHandler
+from handlers.MainHandler import MainHandler, RoomHandler
 from handlers.auth import LogoutHandler, LoginHandler
 from handlers.static_handlers import CssHandler, AssetsLibHandler
 
@@ -34,6 +34,7 @@ class Application(tornado.web.Application):
 
         handlers = [
             (r"/", MainHandler, db_bridge),
+            (r"/room", RoomHandler),
             (r"/login", LoginHandler, db_bridge),
             (r"/logout", LogoutHandler, db_bridge),
             (r"/(.*)/(.*)/(.*)", AssetsLibHandler, db_bridge),
