@@ -15,10 +15,17 @@ class LoginHandler(BaseHandler):
             return
 
         pw = self.get_argument('password')
-        if check_password(pw, user.password):
+        if self.check_password(pw, user.password):
             self.write('User and pass OK')
         else:
             self.write('Wrong user/password')
+
+    def check_password(self, user_pw, db_pw):
+        hash_pw = bcrypt.hashpw(user_pw.encode('utf-8'), db_pw.encode('utf-8'))
+        if hash_pw.decode('utf-8') == db_pw:
+            return True
+        else:
+            return False
 
 
 class LogoutHandler(BaseHandler):
@@ -28,13 +35,13 @@ class LogoutHandler(BaseHandler):
         self.redirect('/')
 
 
-def check_password(user_pw, db_pw):
-    hash_pw = bcrypt.hashpw(user_pw.encode('utf-8'), db_pw.encode('utf-8'))
-    if hash_pw.decode('utf-8') == db_pw:
-        return True
-    else:
-        return False
+class RegisterHandler(BaseHandler):
+    def get(self):
+        raise NotImplementedError
 
+    def post(self):
+        raise NotImplementedError
 
-def generate_password(pw):
-    return bcrypt.hashpw(pw.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    @staticmethod
+    def generate_password(pw):
+        return bcrypt.hashpw(pw.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
