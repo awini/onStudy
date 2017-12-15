@@ -10,7 +10,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from db.models import User, Base
-from handlers.auth import generate_password
+from handlers.auth import RegisterHandler
 from settings import sets
 
 ENGINE = create_engine(sets.DB_SCHEME + sets.DB_NAME)
@@ -50,7 +50,7 @@ def fill_credits(answers):
             break
         print('Password can`t be empty!')
 
-    return username, email, generate_password(password)
+    return username, email, RegisterHandler.generate_password(password)
 
 
 def add_user(username, email, password):

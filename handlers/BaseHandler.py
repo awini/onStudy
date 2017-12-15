@@ -1,4 +1,5 @@
 from tornado.web import RequestHandler
+from db.DBBridge import DBBridge
 
 
 class BaseHandler(RequestHandler):
@@ -13,5 +14,6 @@ class BaseHandler(RequestHandler):
         '''
         return self.get_secure_cookie("user")
 
-    def initialize(self, db_bridge):
-        self.dbb = db_bridge
+    @property
+    def dbb(self):
+        return DBBridge.get_instance()
