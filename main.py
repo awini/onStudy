@@ -12,12 +12,14 @@ from handlers.static_handlers import CssHandler, AssetsLibHandler
 
 
 if __name__ == "__main__" and sets.DEBUG:
-    from subprocess import call
+    from subprocess import call, DEVNULL, check_output
     import sys
 
-    call(sys.executable + " -m pip install -r requirements.txt", shell=True)
-    call(sys.executable + " " + join("scripts", "install.py"), shell=True)
-    call(sys.executable + " " + join("scripts", "init_db.py"), shell=True)
+    if check_output([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"], shell=True).count(b'already satisfied') != 6:
+        raise Exception('!!')
+
+    call([sys.executable, join("scripts", "install.py")], shell=True)
+    call([sys.executable, join("scripts", "init_db.py")], shell=True)
 
 
 
@@ -52,3 +54,4 @@ if __name__ == "__main__":
     app = Application()
     app.listen(8888)
     tornado.ioloop.IOLoop.current().start()
+
