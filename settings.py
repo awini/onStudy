@@ -22,7 +22,9 @@ class _Sets:
 
     COOKIE_SECRET = "RjBvp2+FSHqRQkKqHjAQdzWsLsq2kUu+lEc28GdAaLA="   # change in production!!!
 
-    TEMPLATE_PATH = 'template/'
+    TEMPLATE_PATH = join(dirname(__file__), "template", "")
+
+    SECURITY_COOKIE = 'user'
 
 
 sets = _Sets()

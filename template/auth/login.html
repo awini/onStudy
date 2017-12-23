@@ -1,18 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <!-- Bootstrap -->
-    <link href="css/bootstrap/bootstrap.css" rel="stylesheet">
-    <!-- Custom styles for this template -->
-    <link href="css/jumbotron.css" rel="stylesheet">
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script type="text/javascript" src="js/jquery/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script type="text/javascript" src="js/bootstrap/bootstrap.js"></script>
-</head>
-<body>
+{% extends "../base.html" %}
+
+{% block title %}Login{% end %}
+
+{% block content %}
+
 <div class="container">
     <div class="row main">
         <div class="panel-heading">
@@ -22,7 +13,13 @@
             </div>
         </div>
         <div class="main-login main-center">
-
+            {% if err %}
+            <p class="text-center">
+                Неверный логин или пароль.
+                <br>
+                Попробуйте снова
+            </p>
+            {% end %}
             <form class="form-horizontal" method="post" action="login">
                 {% module xsrf_form_html() %}
                 <div class="form-group">
@@ -53,5 +50,5 @@
         </div>
     </div>
 </div>
-</body>
-</html>
+
+{% end %}
