@@ -34,11 +34,16 @@ class DBBridge:
         DBBridge.__db_sessions.remove()
 
     def get_user(self, username: str):
-        try:
-            user = self.query(User).filter(User.name == username).one()
-        except NoResultFound:
-            user = None
-        finally:
-            self.finish_query()
+        with self as query:
+            try:
+                user = query(User).filter(User.name == username).one()
+            except NoResultFound:
+                user = None
         return user
+
+    def __enter__(self):
+        return DBBridge.__db_sessions.query
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.finish_query()
 
