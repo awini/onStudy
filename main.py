@@ -19,7 +19,7 @@ if __name__ == "__main__" and sets.DEBUG:
 
     _text = check_output(recom([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"]),
                     shell=True)
-    if _text.count(b'already satisfied') != 7:
+    if _text.count(b'already satisfied') != 6:
         raise Exception('Wrong requirements:\n\t' + _text.decode('utf-8'))
 
     call(recom([sys.executable, join("scripts", "install.py")]), shell=True)
