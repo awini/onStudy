@@ -3,10 +3,15 @@ import tornado.web
 
 import bcrypt
 
+from settings import sets
+
 
 class LoginHandler(BaseHandler):
     def get(self):
         self.render('login.html')
+
+    def get_template_path(self):
+        return sets.TEMPLATE_PATH + 'auth'
 
     def post(self):
         user = self.dbb.get_user(self.get_argument('username'))

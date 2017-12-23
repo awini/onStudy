@@ -40,7 +40,7 @@ class Application(tornado.web.Application):
             "cookie_secret": sets.COOKIE_SECRET,
             "login_url": "/login",
             "xsrf_cookies": True,
-            'template_path': 'template/',
+            'template_path': sets.TEMPLATE_PATH,
             'debug': sets.DEBUG,
         }
 

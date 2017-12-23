@@ -22,5 +22,7 @@ class _Sets:
 
     COOKIE_SECRET = "RjBvp2+FSHqRQkKqHjAQdzWsLsq2kUu+lEc28GdAaLA="   # change in production!!!
 
+    TEMPLATE_PATH = 'template/'
+
 
 sets = _Sets()
