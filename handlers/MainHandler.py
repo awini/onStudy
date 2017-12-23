@@ -9,6 +9,12 @@ class MainHandler(BaseHandler):
         return self.render("main.html")
 
 
+class AboutHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        return self.render("about.html")
+
+
 class RoomHandler(tornado.web.RequestHandler):
 
     def get(self):

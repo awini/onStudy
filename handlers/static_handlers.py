@@ -1,10 +1,10 @@
-from handlers.BaseHandler import BaseHandler
+from tornado.web import RequestHandler
 
 from os.path import join, exists
 from settings import sets
 
 
-class AssetsLibHandler(BaseHandler):
+class AssetsLibHandler(RequestHandler):
 
     def get(self, static_type, lib, filename):
         dist_variants = ()
@@ -23,7 +23,7 @@ class AssetsLibHandler(BaseHandler):
         self.send_error(404)
 
 
-class CssHandler(BaseHandler):
+class CssHandler(RequestHandler):
 
     def get(self, filename):
         self.set_header("Content-Type", "text/css")

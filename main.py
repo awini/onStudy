@@ -6,7 +6,7 @@ import tornado.web
 
 from settings import sets
 
-from handlers.MainHandler import MainHandler, RoomHandler
+from handlers.MainHandler import MainHandler, RoomHandler, AboutHandler
 from handlers.auth import LogoutHandler, LoginHandler, RegisterHandler
 from handlers.static_handlers import CssHandler, AssetsLibHandler
 
@@ -32,20 +32,21 @@ class Application(tornado.web.Application):
 
         handlers = [
             (r"/", MainHandler),
+            (r"/about", AboutHandler),
             (r"/room", RoomHandler),
-            (r"/login", LoginHandler),
-            (r"/logout", LogoutHandler),
+            (r"/auth/login", LoginHandler),
+            (r"/auth/logout", LogoutHandler),
+            (r"/auth/register", RegisterHandler),
             (r"/(.*)/(.*)/(.*)", AssetsLibHandler),
             (r"/css/(.*)", CssHandler),
-            (r"/register", RegisterHandler),
         ]
 
         settings = {
             "static_path": sets.STATIC_PATH,
             "cookie_secret": sets.COOKIE_SECRET,
-            "login_url": "/login",
+            "login_url": "/auth/login",
             "xsrf_cookies": True,
-            'template_path': 'template/',
+            'template_path': sets.TEMPLATE_PATH,
             'debug': sets.DEBUG,
         }
 

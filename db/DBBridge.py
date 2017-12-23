@@ -34,11 +34,30 @@ class DBBridge:
         DBBridge.__db_sessions.remove()
 
     def get_user(self, username: str):
-        try:
-            user = self.query(User).filter(User.name == username).one()
-        except NoResultFound:
-            user = None
-        finally:
-            self.finish_query()
+        with self as query:
+            try:
+                user = query(User).filter(User.name == username).one()
+            except NoResultFound:
+                user = None
         return user
+
+    def get_user_by_email(self, email):
+        with self as query:
+            try:
+                user = query(User).filter(User.email == email).one()
+            except NoResultFound:
+                user = None
+        return user
+
+    def create_user(self, username, password, email):
+        u = User(name=username, password=password, email=email)
+        self.__db_sessions.add(u)
+        self.__db_sessions.commit()
+        self.finish_query()
+
+    def __enter__(self):
+        return DBBridge.__db_sessions.query
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.finish_query()
 
