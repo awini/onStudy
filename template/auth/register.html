@@ -1,0 +1,76 @@
+{% extends "../base.html" %}
+
+{% block title %}Registration{% end %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row main">
+        <div class="main-login main-center">
+            <div>
+                {% if msg %}
+                    <p class="text-center"> {{ msg }}</p>
+                {% end %}
+            </div>
+
+            <form class="form-horizontal" method="post" action="">
+                {% module xsrf_form_html() %}
+
+                <div class="form-group">
+                    <label for="username" class="cols-sm-2 control-label">Имя пользователя</label>
+                    <div class="cols-sm-10 off">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-users fa" aria-hidden="true"></i></span>
+                            <input type="text" class="form-control" name="username" id="username"  placeholder="Введите имя пользователя" required/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="cols-sm-2 control-label">Ваш Email</label>
+                    <div class="cols-sm-10 off">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-envelope fa" aria-hidden="true"></i></span>
+                            <input type="email" class="form-control" name="email" id="email"  placeholder="Введите Ваш Email" required/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="cols-sm-2 control-label">Пароль</label>
+                    <div class="cols-sm-10 off">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
+                            <input type="password" class="form-control" name="password" id="password"  placeholder="Введите пароль" required/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password2" class="cols-sm-2 control-label">Подтвердите пароль</label>
+                    <div class="cols-sm-10 off">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
+                            <input type="password" class="form-control" name="password2" id="password2"  placeholder="Введите пароль еще раз" required oninput="check(this)"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group-sm">
+                    <button type="submit" class="btn btn-primary btn-block login-button">Зарегистрироваться</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
+
+<script language='javascript' type='text/javascript'>
+    function check(input) {
+        if (input.value != document.getElementById('password').value) {
+            input.setCustomValidity('Password Must be Matching.');
+        } else {
+            input.setCustomValidity('');
+        }
+    }
+</script>
+{% end %}

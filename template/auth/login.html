@@ -13,11 +13,8 @@
             </div>
         </div>
         <div class="main-login main-center">
-            {% if err %}
-            <p class="text-center">
-                Неверный логин или пароль.
-                <br>
-                Попробуйте снова
+            {% if msg %}
+            <p class="text-center"> {{ msg }}
             </p>
             {% end %}
             <form class="form-horizontal" method="post" action="login">
@@ -44,9 +41,11 @@
 
                 <input type="hidden" name="next" value="{{ next }}" />
                 <div class="btn-group-sm">
+
                     <button type="submit" class="btn btn-group-sm btn-primary btn-lg btn-block login-button">Войти</button>
                 </div>
             </form>
+            <a href="register">Зарегистрироваться</a>
         </div>
     </div>
 </div>
