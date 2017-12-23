@@ -46,12 +46,12 @@
             </li>
           </ul>
             <div class="nav navbar-nav navbar-right">
-                <div> Добро пожаловать, </div>
+                <div> Добро пожаловать,
                 {% if current_user %}
-                <div>{{ current_user }}</div>
+                    {{ current_user }}
                 <div><a href="/auth/logout">logout</a></div>
                 {% else %}
-                <div>Гость</div>
+                    Гость
                 <div><a href="/auth/login">login</a></div>
                 {% end %}
             </div>

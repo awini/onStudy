@@ -17,9 +17,10 @@ if __name__ == "__main__" and sets.DEBUG:
 
     recom = lambda com: com if sys.platform.startswith("win") else ' '.join(com)
 
-    if check_output(recom([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"]),
-                    shell=True).count(b'already satisfied') != 6:
-        raise Exception('!!')
+    _text = check_output(recom([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"]),
+                    shell=True)
+    if _text.count(b'already satisfied') != 6:
+        raise Exception('Wrong requirements:\n\t' + _text)
 
     call(recom([sys.executable, join("scripts", "install.py")]), shell=True)
     call(recom([sys.executable, join("scripts", "init_db.py"), "dont_remove"]), shell=True)
