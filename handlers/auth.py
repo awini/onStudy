@@ -50,7 +50,7 @@ class RegisterHandler(BaseHandler):
         password = self.get_argument('password')
         password2 = self.get_argument('password2')
         email = self.get_argument('email')
-        err = []
+        err = ''
         if password != password2:
             err += 'Passworm mistmatch\n'
         if self.dbb.get_user(user):
