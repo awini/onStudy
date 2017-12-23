@@ -29,14 +29,14 @@ def rm_bd_file():
     try:
         bd_fl.unlink()  # remove file
     except Exception as e:
-        print('Error with removing file {}!'.format(sets.DB_NAME))
-        print('Error description: \n {}'.format(e))
+        print('\tError with removing file {}!'.format(sets.DB_NAME))
+        print('\tError description: \n {}'.format(e))
         exit()
-    print('File {} was removed'.format(sets.DB_NAME))
+    print('\tFile {} was removed'.format(sets.DB_NAME))
 
 
 def fill_credits(answers):
-    print('Fill user credits')
+    print('\tFill user credits')
     username = answers["username"] if "username" in answers else input('Enter username(admin): ')
     if not username:
         username = 'admin'
@@ -48,13 +48,13 @@ def fill_credits(answers):
         password = answers["password"] if "password" in answers else input('Enter password:')
         if password:
             break
-        print('Password can`t be empty!')
+        print('\tPassword can`t be empty!')
 
     return username, email, RegisterHandler.generate_password(password)
 
 
 def add_user(username, email, password):
-    print('Add user {}'.format(username))
+    print('\tAdd user {}'.format(username))
     u = User(name=username, password=password, email=email)
     Session = sessionmaker(bind=ENGINE)
     session = Session()
@@ -63,17 +63,17 @@ def add_user(username, email, password):
 
 
 def prepare_db_dir(answers):
-    print('Search for file {} in current directory'.format(sets.DB_NAME))
+    #print('\tSearch for file {} in current directory'.format(sets.DB_NAME))
     if check_bd_file():
         user_ans = answers["remove_existed"] if "remove_existed" in answers else input('Find file "{}"! Remove it? y/n \n'.format(sets.DB_NAME))
 
         if 'y' not in user_ans.lower():
-            print('Exit program, can not initialize when file exist!')
+            #print('Exit program, can not initialize when file exist!')
             exit()
 
         rm_bd_file()
     else:
-        print('File not found')
+        print('\tFile not found')
 
     create_bd_dir()
 
@@ -81,13 +81,19 @@ def prepare_db_dir(answers):
 def reinit_db(answers={}):
     prepare_db_dir(answers)
 
-    print('Start initialize DB')
+    print('\tStart initialize DB')
     Base.metadata.create_all(ENGINE)
 
     add_user(*fill_credits(answers))
 
-    print('Success')
+    print('\tSuccess')
 
 
 if __name__ == '__main__':
-    reinit_db()
+    import sys
+
+    answers = {}
+    if 'dont_remove' in sys.argv:
+        answers['remove_existed'] = 'n'
+
+    reinit_db(answers)

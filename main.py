@@ -15,11 +15,14 @@ if __name__ == "__main__" and sets.DEBUG:
     from subprocess import call, DEVNULL, check_output
     import sys
 
-    if check_output([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"], shell=True).count(b'already satisfied') != 6:
+    recom = lambda com: com if sys.platform.startswith("win") else ' '.join(com)
+
+    if check_output(recom([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"]),
+                    shell=True).count(b'already satisfied') != 6:
         raise Exception('!!')
 
-    call([sys.executable, join("scripts", "install.py")], shell=True)
-    call([sys.executable, join("scripts", "init_db.py")], shell=True)
+    call(recom([sys.executable, join("scripts", "install.py")]), shell=True)
+    call(recom([sys.executable, join("scripts", "init_db.py"), "dont_remove"]), shell=True)
 
 
 
@@ -51,6 +54,7 @@ class Application(tornado.web.Application):
 
 
 if __name__ == "__main__":
+    print('server on 0.0.0.0:8888 started.')
     app = Application()
     app.listen(8888)
     tornado.ioloop.IOLoop.current().start()
