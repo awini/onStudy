@@ -3,3 +3,8 @@ body {
   padding-top: 50px;
   padding-bottom: 20px;
 }
+
+.nav-line-vcentered {
+    text-align: center;
+    line-height: 50px;
+}

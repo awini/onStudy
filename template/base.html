@@ -22,7 +22,7 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-default navbar-fixed-top">
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -38,24 +38,24 @@
             <li><a href="/">Home</a></li>
             <li><a href="/about">About</a></li>
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Чаты <span class="caret"></span></a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Chats <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href="#">Активные чаты</a></li>
-                <li><a href="#">Создать чат</a></li>
+                <li><a href="#">Active chats</a></li>
+                <li><a href="#">+Create chat</a></li>
               </ul>
             </li>
           </ul>
-            <div class="nav navbar-nav navbar-right">
-                <div> Добро пожаловать,
+            <div class="nav navbar-nav navbar-right nav-line-vcentered">
+                <div>
                 {% if current_user %}
-                    {{ current_user }}
-                <div><a href="/auth/logout">logout</a></div>
+                    Hello, {{ current_user }}
+                    <div><a href="/auth/logout" class="btn btn-success">logout</a></div>
                 {% else %}
-                    Гость
-                <div><a href="/auth/login">login</a></div>
+                    <div><a href="/auth/login" class="btn btn-success">login</a></div>
                 {% end %}
-            </div>
-        </div><!--/.nav-collapse -->
+                </div>
+            </div><!--/.nav-collapse -->
+        </div>
       </div>
     </nav>
 
