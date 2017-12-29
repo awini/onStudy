@@ -6,7 +6,7 @@ import tornado.web
 
 from settings import sets
 
-from handlers.MainHandler import MainHandler, RoomHandler, AboutHandler
+from handlers.MainHandler import MainHandler, RoomHandler, AboutHandler, StreamTstHandler
 from handlers.auth import LogoutHandler, LoginHandler, RegisterHandler
 from handlers.static_handlers import CssHandler, AssetsLibHandler
 
@@ -26,7 +26,6 @@ if __name__ == "__main__" and sets.DEBUG:
     call(recom([sys.executable, join("scripts", "init_db.py"), "dont_remove"]), shell=True)
 
 
-
 class Application(tornado.web.Application):
 
     def __init__(self):
@@ -35,6 +34,7 @@ class Application(tornado.web.Application):
             (r"/", MainHandler),
             (r"/about", AboutHandler),
             (r"/room", RoomHandler),
+            (r"/stream", StreamTstHandler),
             (r"/auth/login", LoginHandler),
             (r"/auth/logout", LogoutHandler),
             (r"/auth/register", RegisterHandler),

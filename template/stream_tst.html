@@ -1,0 +1,22 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Live Streaming</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.3.3/video-js.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.3.3/video.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/videojs-flash@2/dist/videojs-flash.min.js"></script>
+</head>
+<body>
+<video id="player" class="video-js vjs-default-skin" height="720" width="1280" controls preload="none"
+>
+    <source src="rtmp://localhost/myapp/mystream" type="rtmp/flv" />
+</video>
+<script>
+    var player = videojs('#player', {
+                techOrder: ["flash"]
+            });
+</script>
+</body>
+</html>

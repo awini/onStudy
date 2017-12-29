@@ -9,7 +9,7 @@ class AssetsLibHandler(RequestHandler):
     def get(self, static_type, lib, filename):
         dist_variants = ()
         if static_type == "js":
-            dist_variants = ("dist", "dist/js", "dest")
+            dist_variants = ("dist", "dist/js", "dest", "src/js")
             self.set_header("Content-Type", "text/js")
         elif static_type == "css":
             dist_variants = ("dist/css",)

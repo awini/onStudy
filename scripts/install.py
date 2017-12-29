@@ -8,13 +8,19 @@ def run(com, check=None):
             return
     call(com, shell=True)
 
+def add_module(name, step='S'):
+    run('bower i -' + step + ' '+name, check=lambda: not exists("bower_components/"+name))
+
 
 if __name__=='__main__':
 
     run('npm i -g bower', check = lambda: not exists("bower_components"))
     run('bower init', check = lambda: not exists("bower_components") or not exists("bower.json"))
-    run('bower i -S bootstrap', check = lambda: not exists("bower_components/bootstrap"))
-    run('bower i -S jquery', check = lambda: not exists("bower_components/jquery"))
-    run('bower i -S html5shiv', check = lambda: not exists("bower_components/html5shiv"))
-    run('bower i -S respond', check = lambda: not exists("bower_components/respond"))
-    run('bower i -D mocha', check = lambda: not exists("bower_components/mocha"))
+
+    add_module('bootstrap')
+    add_module('jquery')
+    add_module('html5shiv')
+    add_module('respond')
+    #add_module('videojs')
+
+    add_module('mocha', step='D')

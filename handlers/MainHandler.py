@@ -1,6 +1,12 @@
-from handlers.BaseHandler import BaseHandler
+from handlers.BaseHandler import BaseHandler, RequestHandler
 import tornado.web
 from tornado import gen, web, httpclient
+
+
+class StreamTstHandler(RequestHandler):
+
+    def get(self):
+        return self.render("stream_tst.html")
 
 
 class MainHandler(BaseHandler):
