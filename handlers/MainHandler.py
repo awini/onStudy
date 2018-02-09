@@ -1,12 +1,23 @@
 from handlers.BaseHandler import BaseHandler, RequestHandler
 import tornado.web
 from tornado import gen, web, httpclient
+from handlers.auth import StreamRegHandler
+from settings import sets
 
 
 class StreamTstHandler(RequestHandler):
 
+    @tornado.web.authenticated
     def get(self):
-        return self.render("stream_tst.html")
+        key = StreamRegHandler.get_user_key(self.get_current_user())
+        return self.render("stream_tst.html", key=key)
+
+    def get_current_user(self):
+        '''
+        get username from cookie called "user"
+        :return: username
+        '''
+        return self.get_secure_cookie(sets.SECURITY_COOKIE)
 
 
 class MainHandler(BaseHandler):

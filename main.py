@@ -7,7 +7,7 @@ import tornado.web
 from settings import sets
 
 from handlers.MainHandler import MainHandler, RoomHandler, AboutHandler, StreamTstHandler
-from handlers.auth import LogoutHandler, LoginHandler, RegisterHandler
+from handlers.auth import LogoutHandler, LoginHandler, RegisterHandler, StreamRegHandler
 from handlers.static_handlers import CssHandler, AssetsLibHandler
 
 
@@ -38,6 +38,7 @@ class Application(tornado.web.Application):
             (r"/auth/login", LoginHandler),
             (r"/auth/logout", LogoutHandler),
             (r"/auth/register", RegisterHandler),
+            (r"/auth/stream", StreamRegHandler),
             (r"/(.*)/(.*)/(.*)", AssetsLibHandler),
             (r"/css/(.*)", CssHandler),
         ]

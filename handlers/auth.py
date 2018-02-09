@@ -69,3 +69,37 @@ class RegisterHandler(BaseHandler):
     @staticmethod
     def generate_password(pw):
         return bcrypt.hashpw(pw.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+
+OKSYMS = 'qwertyuiopasdfghjklzxcvbnm'
+OKSYMS += OKSYMS.upper()
+
+
+class StreamRegHandler(tornado.web.RequestHandler):
+    user_keys = {}
+
+    @staticmethod
+    def get_user_key(name):
+        key = StreamRegHandler.user_keys.get(name)
+        if not key:
+            key = ''.join( a for a in RegisterHandler.generate_password(name.decode('utf-8')) if a in OKSYMS)
+            StreamRegHandler.user_keys[name] = key
+        return key
+
+    def check_xsrf_cookie(self):
+        return True
+
+    def get(self):
+        pass
+
+    def post(self, *args, **kwargs):
+        if self.request.arguments['key'][0].decode() in StreamRegHandler.user_keys.values():
+            print('OK!')
+            self.set_status(200)
+        else:
+            print('False!')
+            self.set_status(300)
+        print(self.request.arguments)
+
+
+
