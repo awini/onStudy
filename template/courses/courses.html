@@ -1,0 +1,30 @@
+{% extends "../base.html" %}
+
+{% block title %}Home{% end %}
+
+{% block content %}
+
+<br><br><br><br>
+
+<table style="width:50%">
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Stream Key</th>
+    <th>Mode</th>
+    <th>State</th>
+  </tr>
+    {% for c in courses %}
+  <tr>
+    <td> <a href="course/manage?course={{ c.name }}">{{ c.name }}</a></td>
+    <td>{{ c.description }}</td>
+    <td>{{ c.stream_key}}</td>
+    <td>{{ c.mode }}</td>
+    <td>{{ c.state }}</td>
+  </tr>
+    {% end %}
+</table>
+
+
+
+{% end %}

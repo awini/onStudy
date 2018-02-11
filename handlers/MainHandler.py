@@ -17,7 +17,9 @@ class StreamTstHandler(RequestHandler):
         get username from cookie called "user"
         :return: username
         '''
-        return self.get_secure_cookie(sets.SECURITY_COOKIE)
+        username = self.get_secure_cookie(sets.SECURITY_COOKIE)
+        if username:
+            return username.decode()
 
 
 class MainHandler(BaseHandler):

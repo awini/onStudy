@@ -2,6 +2,7 @@ from handlers.BaseHandler import BaseHandler
 import tornado.web
 
 import bcrypt
+from uuid import uuid4
 
 from settings import sets
 
@@ -71,10 +72,6 @@ class RegisterHandler(BaseHandler):
         return bcrypt.hashpw(pw.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
 
-OKSYMS = 'qwertyuiopasdfghjklzxcvbnm'
-OKSYMS += OKSYMS.upper()
-
-
 class StreamRegHandler(tornado.web.RequestHandler):
     user_keys = {}
 
@@ -82,7 +79,7 @@ class StreamRegHandler(tornado.web.RequestHandler):
     def get_user_key(name):
         key = StreamRegHandler.user_keys.get(name)
         if not key:
-            key = ''.join( a for a in RegisterHandler.generate_password(name.decode('utf-8')) if a in OKSYMS)
+            key = str(uuid4())
             StreamRegHandler.user_keys[name] = key
         return key
 
@@ -93,6 +90,7 @@ class StreamRegHandler(tornado.web.RequestHandler):
         pass
 
     def post(self, *args, **kwargs):
+        print('QWEQWEQWEQE')
         if self.request.arguments['key'][0].decode() in StreamRegHandler.user_keys.values():
             print('OK!')
             self.set_status(200)

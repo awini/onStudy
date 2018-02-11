@@ -1,0 +1,80 @@
+{% extends "../base.html" %}
+
+{% block title %}Home{% end %}
+
+{% block content %}
+
+
+<br><br><br>
+Name: {{ course.name}}<br>
+Description: {{ course.description }}<br>
+Stream Key: {{ course.stream_key}}<br>
+Mode: {{ course.mode }}<br>
+State: {{ course.state }}<br>
+
+<br><br>
+
+    {% if lessons %}
+        Lessons:
+        <table style="width:50%">
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Start Time:</th>
+            <th>Duration</th>
+            <th>State</th>
+            <th>Action</th>
+          </tr>
+            {% for l in lessons %}
+          <tr>
+            <td>{{ l.name }}</td>
+            <td>{{ l.description }}</td>
+            <td>{{ l.start_time}}</td>
+            <td>{{ l.duration }}</td>
+            <td>{{ l.state }}</td>
+            {% if l.state == 'Waiting' %}
+                <td> <button type="button" class="removeBtn" value="{{ l.name }}">remove</button> </td>
+            {% else %}
+                <td> No action</td>
+            {% end %}
+          </tr>
+            {% end %}
+        </table>
+    {% else %}
+        <p> No lessons!!</p>
+    {% end %}
+
+<br><br>
+<button type="button" id="addLesson">Add lesson</button>
+
+<br><br>
+    {% if course.state == 'Created' %}
+        <button type="button" id="courseAction" value="Published">Publish </button>
+    {% else %}
+        <button type="button" id="courseAction" value="Interrupted">Cancel Course</button>
+    {% end %}
+
+<div class="modal fade" id="addLessonModal" role="dialog">
+<div class="modal-dialog">
+<div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h4 class="modal-title">Adding Lesson</h4>
+    </div>
+    <div class="modal-body">
+        <form action="" method="post" id="addLessonForm">
+        <label>Name: </label><input type="text" id="addLessonName" required /><br>
+        <label>Description:</label><br><textarea rows="4" cols="50" id="addLessonDescription" required> Enter description </textarea><br>
+        <label>Start time: </label><input type="datetime-local" id="addLessonStartTime" required /><br>
+        <label>Duration(minutes): </label><input type="number" min="0" id="addLessonDuration" required /><br>
+        <input type="hidden" id="addLessonCursename" value="{{ course.name }}">
+        <input type="submit" value="Add" class="btn btn-default"/>
+        </form>
+    </div>
+</div>
+</div>
+</div><!--End of Modal-->
+
+<script type="text/javascript" src="/static/js/course_manager/course_manage.js"></script>
+<script type="text/javascript" src="/static/js/course_manager/lesson_manage.js"></script>
+{% end %}

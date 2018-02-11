@@ -1,0 +1,30 @@
+{% extends "../base.html" %}
+
+{% block title %}Home{% end %}
+
+{% block content %}
+
+
+<br><br><br><br><br>
+<form action="" method="post" id="createCourseForm">
+
+    {% module xsrf_form_html() %}
+
+  Course name:<br>
+  <input type="text" name="courseName" id="courseName">
+  <br>
+  Course mode:<br>
+  <select name="courseMode" id="courseMode">
+    {% for mode in modes%}
+    <option value="{{ mode }}">{{ mode }}</option>
+    {% end %}
+  </select>
+  <br>
+  Course description:<br>
+  <textarea rows="4" cols="50" name="courseDescription" id="courseDescription"> Enter description </textarea>
+  <br><br>
+  <input type="submit" value="Create">
+</form>
+
+<script type="text/javascript" src="/static/js/course_manager/course_create.js"></script>
+{% end %}

@@ -9,6 +9,7 @@ from settings import sets
 from handlers.MainHandler import MainHandler, RoomHandler, AboutHandler, StreamTstHandler
 from handlers.auth import LogoutHandler, LoginHandler, RegisterHandler, StreamRegHandler
 from handlers.static_handlers import CssHandler, AssetsLibHandler
+from handlers.course_manager import CreateCourseHandler, ManageCourseHandler, CourseHandler, LessonHandler
 
 
 if __name__ == "__main__" and sets.DEBUG:
@@ -41,6 +42,10 @@ class Application(tornado.web.Application):
             (r"/auth/stream", StreamRegHandler),
             (r"/(.*)/(.*)/(.*)", AssetsLibHandler),
             (r"/css/(.*)", CssHandler),
+            (r"/course", CourseHandler),
+            (r"/course/create", CreateCourseHandler),
+            (r"/course/manage", ManageCourseHandler),
+            (r"/course/lesson", LessonHandler),
         ]
 
         settings = {
