@@ -71,6 +71,14 @@ class DBBridge:
                 lessons.append(l)
         return course, lessons
 
+    def get_course_by_stream(self, key):
+        with self as query:
+            try:
+                course = query(Course).filter(Course.stream_key == key)
+            except NoResultFound:
+                course = None
+        return course
+
     def get_all_user_course(self, username):
         user = self.get_user(username)
         with self as query:

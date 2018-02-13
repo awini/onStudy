@@ -27,7 +27,8 @@ class LoginHandler(BaseHandler):
         else:
             self.render('login.html', msg='Wrong user/password')
 
-    def check_password(self, user_pw, db_pw):
+    @staticmethod
+    def check_password(user_pw, db_pw):
         hash_pw = bcrypt.hashpw(user_pw.encode('utf-8'), db_pw.encode('utf-8'))
         if hash_pw.decode('utf-8') == db_pw:
             return True
@@ -72,7 +73,7 @@ class RegisterHandler(BaseHandler):
         return bcrypt.hashpw(pw.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
 
-class StreamRegHandler(tornado.web.RequestHandler):
+class StreamRegHandler(BaseHandler):
     user_keys = {}
 
     @staticmethod
@@ -90,14 +91,35 @@ class StreamRegHandler(tornado.web.RequestHandler):
         pass
 
     def post(self, *args, **kwargs):
-        print('QWEQWEQWEQE')
-        if self.request.arguments['key'][0].decode() in StreamRegHandler.user_keys.values():
-            print('OK!')
-            self.set_status(200)
-        else:
-            print('False!')
-            self.set_status(300)
-        print(self.request.arguments)
+        call_type = self.get_argument('call')  # 'publish' for server and 'play' for client
+        if call_type == 'publish':
+            #  server parse
+            stream_key = self.get_argument('name')
+            pw = self.get_argument('password')
 
+            user = self.dbb.get_user(self.get_argument('username'))
+            course = self.dbb.get_course_by_stream(stream_key)
+            if course and user:
+                if LoginHandler.check_password(pw, user.password):
+                    print('server success auth')
+                    self.set_status(200)
+                else:
+                    print('server false auth (wrong user/password)')
+                    self.set_status(401)
+                    return
+            else:
+                print('Server false auth (wrong user/stream key)')
+                self.set_status(401)
+            return
 
-
+        elif call_type == 'play':
+            #  client parse
+            if self.request.arguments['key'][0].decode() in StreamRegHandler.user_keys.values():
+                print('Client success auth')
+                self.set_status(200)
+            else:
+                print('Client false auth')
+                self.set_status(401)
+            return
+        self.set_status(401)
+        print('unknown call type')
