@@ -4,6 +4,7 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
 from uuid import uuid4
+from datetime import datetime, timedelta
 
 from db.models import User, Lesson, LessonMembers, Course
 from settings import sets
@@ -87,6 +88,37 @@ class DBBridge:
             except NoResultFound:
                 courses = None
         return courses
+
+    def get_lessons_by_stream(self, stream_key):
+        lessons = []
+        with self as query:
+            courses = query(Course).filter(Course.stream_key == stream_key).one()
+            for l in courses._lesson:
+                lessons.append(l)
+        return lessons
+
+    @modify_db
+    def activate_lesson(self, stream_key):
+        lesson = None
+        with self as query:
+            courses = query(Course).filter(Course.stream_key == stream_key).one()
+            for l in courses._lesson:
+                dif_time = (datetime.now() - l.start_time).total_seconds() / 60  # value in minutes
+                allow_time = dif_time + sets.STREAM_WINDOW
+                is_possible = dif_time < (l.duration + sets.STREAM_WINDOW)
+                try:
+                    if allow_time > 0 and is_possible and (l.state == 'Waiting' or l.state == 'Live') :
+                        if lesson.start_time > l.start_time:
+                            # find the nearest lesson
+                            lesson = l
+                except AttributeError:
+                    lesson = l
+
+            if lesson and lesson.state == 'Waiting':
+                lesson.state = Lesson.LESSON_STATE['Live']
+                self.__db_sessions.commit()
+                print('change lesson "{}" state from "{}" to "Live"'.format(lesson.name, lesson.state))
+        return lesson
 
     @modify_db
     def create_user(self, username, password, email):

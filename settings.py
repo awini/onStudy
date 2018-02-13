@@ -26,5 +26,7 @@ class _Sets:
 
     SECURITY_COOKIE = 'user'
 
+    STREAM_WINDOW = 15  # val in minutes, that define allowed interval before lesson start and after lesson duration
+
 
 sets = _Sets()

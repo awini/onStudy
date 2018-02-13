@@ -2,7 +2,6 @@ from handlers.BaseHandler import BaseHandler
 import tornado.web
 
 import bcrypt
-from uuid import uuid4
 
 from settings import sets
 
@@ -71,55 +70,3 @@ class RegisterHandler(BaseHandler):
     @staticmethod
     def generate_password(pw):
         return bcrypt.hashpw(pw.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-
-
-class StreamRegHandler(BaseHandler):
-    user_keys = {}
-
-    @staticmethod
-    def get_user_key(name):
-        key = StreamRegHandler.user_keys.get(name)
-        if not key:
-            key = str(uuid4())
-            StreamRegHandler.user_keys[name] = key
-        return key
-
-    def check_xsrf_cookie(self):
-        return True
-
-    def get(self):
-        pass
-
-    def post(self, *args, **kwargs):
-        call_type = self.get_argument('call')  # 'publish' for server and 'play' for client
-        if call_type == 'publish':
-            #  server parse
-            stream_key = self.get_argument('name')
-            pw = self.get_argument('password')
-
-            user = self.dbb.get_user(self.get_argument('username'))
-            course = self.dbb.get_course_by_stream(stream_key)
-            if course and user:
-                if LoginHandler.check_password(pw, user.password):
-                    print('server success auth')
-                    self.set_status(200)
-                else:
-                    print('server false auth (wrong user/password)')
-                    self.set_status(401)
-                    return
-            else:
-                print('Server false auth (wrong user/stream key)')
-                self.set_status(401)
-            return
-
-        elif call_type == 'play':
-            #  client parse
-            if self.request.arguments['key'][0].decode() in StreamRegHandler.user_keys.values():
-                print('Client success auth')
-                self.set_status(200)
-            else:
-                print('Client false auth')
-                self.set_status(401)
-            return
-        self.set_status(401)
-        print('unknown call type')

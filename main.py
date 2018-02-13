@@ -6,10 +6,11 @@ import tornado.web
 
 from settings import sets
 
-from handlers.MainHandler import MainHandler, RoomHandler, AboutHandler, StreamTstHandler
-from handlers.auth import LogoutHandler, LoginHandler, RegisterHandler, StreamRegHandler
+from handlers.MainHandler import MainHandler, RoomHandler, AboutHandler
+from handlers.auth import LogoutHandler, LoginHandler, RegisterHandler
 from handlers.static_handlers import CssHandler, AssetsLibHandler
 from handlers.course_manager import CreateCourseHandler, ManageCourseHandler, CourseHandler, LessonHandler
+from handlers.stream_handlers import StreamAuthHandler, StreamUpdateHandler, StreamTstHandler
 
 
 if __name__ == "__main__" and sets.DEBUG:
@@ -35,13 +36,17 @@ class Application(tornado.web.Application):
             (r"/", MainHandler),
             (r"/about", AboutHandler),
             (r"/room", RoomHandler),
+
             (r"/stream", StreamTstHandler),
+            (r"/stream/auth", StreamAuthHandler),
+            (r"/stream/update", StreamUpdateHandler),
+
             (r"/auth/login", LoginHandler),
             (r"/auth/logout", LogoutHandler),
             (r"/auth/register", RegisterHandler),
-            (r"/auth/stream", StreamRegHandler),
             (r"/(.*)/(.*)/(.*)", AssetsLibHandler),
             (r"/css/(.*)", CssHandler),
+
             (r"/course", CourseHandler),
             (r"/course/create", CreateCourseHandler),
             (r"/course/manage", ManageCourseHandler),
