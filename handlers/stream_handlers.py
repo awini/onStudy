@@ -3,7 +3,6 @@ from datetime import datetime
 import tornado.web
 
 from handlers.BaseHandler import BaseHandler
-from handlers.auth import LoginHandler
 from settings import sets
 
 
@@ -28,27 +27,18 @@ class StreamAuthHandler(BaseHandler):
         self.set_status(404)
 
     def post(self, *args, **kwargs):
-        # TODO: it is better to generate unique key for server and display it in course page
-        # TODO: and then send this key as ?key= when start strem. This method avoid sending real password/username
         call_type = self.get_argument('call')
         if call_type == 'publish':
             #  server parse
+
             stream_key = self.get_argument('name')
-            pw = self.get_argument('password')
+            stream_pw = self.get_argument('pphrs')
 
-            user = self.dbb.get_user(self.get_argument('username'))
-
-            lesson = self.dbb.activate_lesson(stream_key)
-            if lesson and user:
-                if LoginHandler.check_password(pw, user.password):
-                    # TODO: change lesson status to close
-                    # TODO: check lesson time
-                    print('server success auth')
-                    self.set_status(200)
-                else:
-                    print('server false auth (wrong user/password)')
-                    self.set_status(401)
-                    return
+            lesson = self.dbb.activate_lesson(stream_key, stream_pw)
+            if lesson:
+                # TODO: WHEN lesson must be close???
+                print('server success auth')
+                self.set_status(200)
             else:
                 print('Server false auth (wrong user/stream key)')
                 self.set_status(401)
@@ -81,23 +71,20 @@ class StreamUpdateHandler(BaseHandler):
         call_type = self.get_argument('call')
         if call_type == 'update_play':
             #  skip check update from clients
+            # TODO: or we can add check if stream not alive - send alert to user
             self.set_status(200)
             return
 
         elif call_type == 'update_publish':
             stream_key = self.get_argument('name')
-            lessons = self.dbb.get_lessons_by_stream(stream_key)
-            for l in lessons:
-                pass_time = (datetime.now() - l.start_time).total_seconds() / 60  # value in minutes
-                print(l.name)
-                print(l.start_time)
-                print(pass_time, l.duration, sets.STREAM_WINDOW)
-                if 0 < pass_time < (l.duration + sets.STREAM_WINDOW):
-                    # TODO: change lesson status to close
-                    break
+            stream_pw = self.get_argument('pphrs')
+            lesson = self.dbb.get_lesson_by_stream(stream_key, stream_pw)
+            pass_time = (datetime.now() - lesson.start_time).total_seconds() / 60
+            if 0 < pass_time < (lesson.duration + sets.STREAM_WINDOW):
+                self.set_status(200)
             else:
+                # TODO: change lesson status to close
                 self.set_status(404)  # any 4xx will break stream
-                return
             self.set_status(200)
             return
 

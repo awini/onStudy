@@ -8,29 +8,31 @@
 <br><br><br>
 Name: {{ course.name}}<br>
 Description: {{ course.description }}<br>
-Stream Key: {{ course.stream_key}}<br>
 Mode: {{ course.mode }}<br>
 State: {{ course.state }}<br>
 
 <br><br>
 
     {% if lessons %}
-        Lessons:
-        <table style="width:50%">
+        Lessons: <br><br>
+        {% for l in lessons %}
+        <table style="width:70%">
           <tr>
             <th>Name</th>
             <th>Description</th>
             <th>Start Time:</th>
             <th>Duration</th>
+            <th>Stream key</th>
             <th>State</th>
             <th>Action</th>
           </tr>
-            {% for l in lessons %}
+
           <tr>
             <td>{{ l.name }}</td>
             <td>{{ l.description }}</td>
             <td>{{ l.start_time}}</td>
             <td>{{ l.duration }}</td>
+            <td>{{ l.stream_key}}?pphrs={{ l.stream_pw }}</td>
             <td>{{ l.state }}</td>
             {% if l.state == 'Waiting' %}
                 <td> <button type="button" class="removeBtn" value="{{ l.name }}">remove</button> </td>
@@ -38,8 +40,9 @@ State: {{ course.state }}<br>
                 <td> No action</td>
             {% end %}
           </tr>
-            {% end %}
         </table>
+        <br><br><br>
+        {% end %}
     {% else %}
         <p> No lessons!!</p>
     {% end %}

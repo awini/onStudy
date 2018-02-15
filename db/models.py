@@ -38,7 +38,6 @@ class Course(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(length=30))
     description = Column(Text)
-    stream_key = Column(String(length=36))
     owner = Column(Integer, ForeignKey('user.id'))
     mode = Column(Choice(COURSE_MODES))
     state = Column(Choice(COURSE_STATES))
@@ -63,6 +62,9 @@ class Lesson(Base):
     duration = Column(Integer)
     state = Column(Choice(LESSON_STATE))
     course = Column(Integer, ForeignKey('course.id'))
+
+    stream_key = Column(String(length=36))
+    stream_pw  = Column(String(length=12))
 
     _course = relationship("Course", back_populates="_lesson")
     _lesson_member = relationship("LessonMembers", back_populates="_lesson")

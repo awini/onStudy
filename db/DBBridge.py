@@ -2,6 +2,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import or_
 
 from uuid import uuid4
 from datetime import datetime, timedelta
@@ -89,35 +90,30 @@ class DBBridge:
                 courses = None
         return courses
 
-    def get_lessons_by_stream(self, stream_key):
-        lessons = []
-        with self as query:
-            courses = query(Course).filter(Course.stream_key == stream_key).one()
-            for l in courses._lesson:
-                lessons.append(l)
-        return lessons
+    def get_lesson_by_stream(self, stream_key, stream_pw):
+        return self.activate_lesson(stream_key, stream_pw)
 
     @modify_db
-    def activate_lesson(self, stream_key):
-        lesson = None
+    def activate_lesson(self, stream_key, stream_pw):
         with self as query:
-            courses = query(Course).filter(Course.stream_key == stream_key).one()
-            for l in courses._lesson:
-                dif_time = (datetime.now() - l.start_time).total_seconds() / 60  # value in minutes
-                allow_time = dif_time + sets.STREAM_WINDOW
-                is_possible = dif_time < (l.duration + sets.STREAM_WINDOW)
-                try:
-                    if allow_time > 0 and is_possible and (l.state == 'Waiting' or l.state == 'Live') :
-                        if lesson.start_time > l.start_time:
-                            # find the nearest lesson
-                            lesson = l
-                except AttributeError:
-                    lesson = l
-
-            if lesson and lesson.state == 'Waiting':
-                lesson.state = Lesson.LESSON_STATE['Live']
-                self.__db_sessions.commit()
-                print('change lesson "{}" state from "{}" to "Live"'.format(lesson.name, lesson.state))
+            try:
+                lesson = query(Lesson).filter(
+                    Lesson.stream_key == stream_key,
+                    Lesson.stream_pw == stream_pw,
+                    or_(Lesson.state == Lesson.LESSON_STATE['Waiting'], Lesson.state == Lesson.LESSON_STATE['Live'])
+                ).one()
+                accept_start = lesson.start_time - timedelta(minutes=sets.STREAM_WINDOW)
+                accept_end = lesson.start_time + timedelta(minutes=lesson.duration) + \
+                             timedelta(minutes=sets.STREAM_WINDOW)
+                if accept_start < datetime.now() < accept_end:
+                    if lesson.state == 'Waiting':
+                        lesson.state = Lesson.LESSON_STATE['Live']
+                        self.__db_sessions.commit()
+                        print('change lesson "{}" state from "{}" to "Live"'.format(lesson.name, lesson.state))
+                else:
+                    lesson = None
+            except NoResultFound:
+                lesson = None
         return lesson
 
     @modify_db
@@ -133,7 +129,6 @@ class DBBridge:
         c = Course(
             name=course_name,
             description=course_descr,
-            stream_key=str(uuid4()),
             owner= user.id,
             mode=Course.COURSE_MODES[mode],
             state=Course.COURSE_STATES['Created'],
@@ -153,6 +148,8 @@ class DBBridge:
             duration=dur,
             state=Lesson.LESSON_STATE['Waiting'],
             course=course.id,
+            stream_key=str(uuid4()),
+            stream_pw=str(uuid4()).split('-')[-1]  # last string after '-' in ******-****-****-****-******
         )
         self.__add_in_db(l)
 
