@@ -97,8 +97,9 @@ class StreamTstHandler(tornado.web.RequestHandler):
 
     @tornado.web.authenticated
     def get(self):
+        stream_key = self.get_argument('stream_key', default='')
         key = StreamAuthHandler.get_user_key(self.get_current_user())
-        return self.render("stream_tst.html", key=key)
+        return self.render("stream_tst.html", key=key, stream_key=stream_key)
 
     def get_current_user(self):
         '''

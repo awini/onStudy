@@ -81,6 +81,24 @@ class DBBridge:
                 course = None
         return course
 
+    def get_open_course_live_lesson(self):
+        lives = []
+        try:
+            courses = self.query(Course).filter(
+                Course.mode == 'Open',
+                Course.state == 'Live',
+            )
+            for c in courses:
+                for lesson in c._lesson:
+                    if lesson.state == 'Live':
+                        lives.append(lesson)
+        except NoResultFound:
+            print('No LIVE course')
+            pass
+        print(lives)
+        return lives
+
+
     def get_all_user_course(self, username):
         user = self.get_user(username)
         with self as query:
@@ -100,16 +118,19 @@ class DBBridge:
                 lesson = query(Lesson).filter(
                     Lesson.stream_key == stream_key,
                     Lesson.stream_pw == stream_pw,
-                    or_(Lesson.state == Lesson.LESSON_STATE['Waiting'], Lesson.state == Lesson.LESSON_STATE['Live'])
+                    or_(Lesson.state == 'Waiting', Lesson.state == 'Live')
                 ).one()
                 accept_start = lesson.start_time - timedelta(minutes=sets.STREAM_WINDOW)
                 accept_end = lesson.start_time + timedelta(minutes=lesson.duration) + \
                              timedelta(minutes=sets.STREAM_WINDOW)
                 if accept_start < datetime.now() < accept_end:
                     if lesson.state == 'Waiting':
-                        lesson.state = Lesson.LESSON_STATE['Live']
-                        self.__db_sessions.commit()
+                        lesson.state = 'Live'
                         print('change lesson "{}" state from "{}" to "Live"'.format(lesson.name, lesson.state))
+                        if lesson._course.state != 'Live':
+                            lesson._course.state = 'Live'
+                            print('Change course "{}" state to live'.format(lesson._course.name))
+                        self.__db_sessions.commit()
                 else:
                     lesson = None
             except NoResultFound:
@@ -130,8 +151,8 @@ class DBBridge:
             name=course_name,
             description=course_descr,
             owner= user.id,
-            mode=Course.COURSE_MODES[mode],
-            state=Course.COURSE_STATES['Created'],
+            mode=mode,
+            state='Created',
         )
         self.__add_in_db(c)
 
@@ -146,7 +167,7 @@ class DBBridge:
             description=l_descr,
             start_time=start_time,
             duration=dur,
-            state=Lesson.LESSON_STATE['Waiting'],
+            state='Waiting',
             course=course.id,
             stream_key=str(uuid4()),
             stream_pw=str(uuid4()).split('-')[-1]  # last string after '-' in ******-****-****-****-******

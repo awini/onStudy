@@ -11,6 +11,7 @@ from handlers.auth import LogoutHandler, LoginHandler, RegisterHandler
 from handlers.static_handlers import CssHandler, AssetsLibHandler
 from handlers.course_manager import CreateCourseHandler, ManageCourseHandler, CourseHandler, LessonHandler
 from handlers.stream_handlers import StreamAuthHandler, StreamUpdateHandler, StreamTstHandler
+from handlers.study_handlers import StudyFindHandler, StudyLiveHandler, StudyManageHandler
 
 
 if __name__ == "__main__" and sets.DEBUG:
@@ -44,6 +45,7 @@ class Application(tornado.web.Application):
             (r"/auth/login", LoginHandler),
             (r"/auth/logout", LogoutHandler),
             (r"/auth/register", RegisterHandler),
+
             (r"/(.*)/(.*)/(.*)", AssetsLibHandler),
             (r"/css/(.*)", CssHandler),
 
@@ -51,6 +53,10 @@ class Application(tornado.web.Application):
             (r"/course/create", CreateCourseHandler),
             (r"/course/manage", ManageCourseHandler),
             (r"/course/lesson", LessonHandler),
+
+            (r"/study/live", StudyLiveHandler),
+            ("/study/find", StudyFindHandler),
+            ("/study/manage", StudyManageHandler),
         ]
 
         settings = {

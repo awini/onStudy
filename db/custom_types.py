@@ -13,9 +13,9 @@ class Choice(types.TypeDecorator):
     def __set_reverse_choices(self):
         self.reverse_choices = {value: key for key, value in self.choices.items()}
 
-    # def process_bind_param(self, value, dialect):
-    #     # value from user input
-    #     return self.reverse_choices[value]
+    def process_bind_param(self, value, dialect):
+        # value from user input
+        return self.choices[value]
 
 
     def process_result_value(self, value, dialect):

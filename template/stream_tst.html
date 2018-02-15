@@ -11,7 +11,7 @@
 <body>
 <video id="player" class="video-js vjs-default-skin" height="720" width="1280" controls preload="none"
 >
-    <source src="rtmp://192.168.100.104/myapp/mystream?key={{ key }}" type="rtmp/flv" />
+    <source src="rtmp://192.168.100.104/myapp/{{stream_key}}?key={{ key }}" type="rtmp/flv" />
 </video>
 <script>
     var player = videojs('#player', {
