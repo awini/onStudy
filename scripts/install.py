@@ -6,7 +6,9 @@ def run(com, check=None):
     if check:
         if not check():
             return
-    call(com, shell=True)
+    ret = call(com, shell=True)
+    if ret != 0:
+        raise Exception('cant install: ' + com + '\n\n\tMaybe you have no Node.js installed? Please install and put to PATH it.\n')
 
 def add_module(name, step='S'):
     run('bower i -' + step + ' '+name, check=lambda: not exists("bower_components/"+name))
