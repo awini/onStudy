@@ -10,6 +10,10 @@ Before init project please install:
 
 `python -m virtualenv env`
 
+3. enable virtual environment by command:
+
+`source env/bin/activate (or env\Scripts\activate.bat)`
+
 After that project installs all other needed components by running it with command:
 
 `python main.py init`
