@@ -1,10 +1,22 @@
 # onStudy
 Platform for online study program languages
 
-## Install and run
 
-Project installs all needed components on first run in debug mode (default).
-Simple run command:
+## Install
+
+Before init project please install:
+1. node.js and put it to Path
+2. virtual environment by command:
+
+`python -m virtualenv env`
+
+After that project installs all other needed components by running it with command:
+
+`python main.py init`
+
+## Next run
+
+After that you can use simple start:
 
 `python main.py`
 
