@@ -186,7 +186,7 @@ class DBBridge:
         user = self.get_user(username)
         with self as query:
             course = query(Course).filter(Course.name == course_name, Course.owner == user.id).one()
-            course.state = Course.COURSE_STATES[state]
+            course.state = state #course.state = Course.COURSE_STATES[state]
             self.__db_sessions.commit()
 
     def __rm_from_db(self, model):
