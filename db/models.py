@@ -22,17 +22,26 @@ class User(Base):
 
 class Course(Base):
     __tablename__ = 'course'
+
+    OPEN = 'Open'
+    CLOSED = 'Closed'
+    PRIVATE = 'Private'
     COURSE_MODES = {
-        'Open': 'O',
-        'Closed': 'C',
-        'Private': 'P',
+        OPEN: 'O',
+        CLOSED: 'C',
+        PRIVATE: 'P',
     }
+    CREATED = 'Created'
+    PUBLISHED = 'Published'
+    LIVE = 'Live'
+    INTERRUPTED = 'Interrupted'
+    ENDED = 'Ended'
     COURSE_STATES = {
-        'Created': 'C',
-        'Published': 'P',
-        'Live': 'L',
-        'Interrupted': 'I',
-        'Ended': 'E',
+        CREATED: 'C',
+        PUBLISHED: 'P',
+        LIVE: 'L',
+        INTERRUPTED: 'I',
+        ENDED: 'E',
     }
 
     id = Column(Integer, primary_key=True)
@@ -48,11 +57,17 @@ class Course(Base):
 
 class Lesson(Base):
     __tablename__ = 'lesson'
+
+    LIVE = 'Live'
+    WAITING = 'Waiting'
+    INTERRUPTED = 'Interrupted'
+    ENDED = 'Ended'
+
     LESSON_STATE = {
-        'Live': 'L',
-        'Waiting': 'W',
-        'Interrupted': 'I',
-        'Ended': 'E',
+        LIVE: 'L',
+        WAITING: 'W',
+        INTERRUPTED: 'I',
+        ENDED: 'E',
     }
 
     id = Column(Integer, primary_key=True)
