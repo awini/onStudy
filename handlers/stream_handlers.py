@@ -99,7 +99,7 @@ class StreamTstHandler(tornado.web.RequestHandler):
     def get(self):
         stream_key = self.get_argument('stream_key', default='')
         key = StreamAuthHandler.get_user_key(self.get_current_user())
-        return self.render("stream_tst.html", key=key, stream_key=stream_key)
+        return self.render("stream_tst.html", key=key, stream_key=stream_key, rtmp_server=sets.RTMP_SERVER)
 
     def get_current_user(self):
         '''

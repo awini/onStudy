@@ -28,5 +28,7 @@ class _Sets:
 
     STREAM_WINDOW = 15  # val in minutes, that define allowed interval before lesson start and after lesson duration
 
+    RTMP_SERVER = '192.168.100.104'  # nginx rtmp server address (MUST use in any js, templates files)
+
 
 sets = _Sets()
