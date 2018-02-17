@@ -5,6 +5,57 @@
 {% block content %}
 
 <br><br><br><br>
-FIND
+{% if open_c %}
+<p> Open courses list:</p> <br>
+<table style="width:50%">
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Autor</th>
+    <th>State</th>
+    <th>Action</th>
+  </tr>
+    {% for c in open_c %}
+  <tr>
+    <td>{{ c.name }}</td>
+    <td>{{ c.description}}</td>
+    <td>{{ c._owner.name }}</td>
+    <td>{{ c.state }}</td>
+    <td> <button type="button" class="addStudyOpenBtn" value="{{ c.name }}">Add to study list</button></td>
+  </tr>
+    {% end %}
+</table>
+{% else %}
+<p> NO OPEN COURSES!!!</p>
+{% end %}
 
+<br><br><br><br>
+
+<br><br><br><br>
+{% if closed_c %}
+<p> Closed courses list:</p> <br>
+<table style="width:50%">
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Autor</th>
+    <th>State</th>
+    <th>Action</th>
+  </tr>
+    {% for c in closed_c %}
+  <tr>
+    <td>{{ c.name }}</td>
+    <td>{{ c.description}}</td>
+    <td>{{ c._owner.name }}</td>
+    <td>{{ c.state }}</td>
+    <td> <button type="button" class="addStudyCloseBtn" value="{{ c.name }}">Register</button></td>
+  </tr>
+    {% end %}
+</table>
+{% else %}
+<p> NO CLOSED COURSES!!!</p>
+{% end %}
+
+
+<script type="text/javascript" src="/static/js/study_manager/study_find.js"></script>
 {% end %}

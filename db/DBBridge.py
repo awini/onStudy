@@ -7,7 +7,7 @@ from sqlalchemy import or_
 from uuid import uuid4
 from datetime import datetime, timedelta
 
-from db.models import User, Lesson, LessonMembers, Course
+from db.models import User, Lesson, CourseMembers, Course
 from settings import sets
 
 
@@ -64,7 +64,7 @@ class DBBridge:
                 user = None
         return user
 
-    def get_course(self, course_name, username):
+    def get_owner_course(self, course_name, username):
         user = self.get_user(username)
         lessons = []
         with self as query:
@@ -72,6 +72,11 @@ class DBBridge:
             for l in course._lesson:
                 lessons.append(l)
         return course, lessons
+
+    def get_course(self, course_name):
+        with self as query:
+            course = query(Course).filter(Course.name == course_name).one()
+        return course
 
     def get_course_by_stream(self, key):
         with self as query:
@@ -90,15 +95,38 @@ class DBBridge:
             )
             for c in courses:
                 for lesson in c._lesson:
-                    if lesson.state == Lesson.LIVE:
+                    if lesson.state == Lesson.LIVE or lesson.state == Lesson.INTERRUPTED:
                         lives.append(lesson)
         except NoResultFound:
             print('No LIVE course')
             pass
         return lives
 
+    def get_all_course(self, username):
+        user = self.get_user(username)
+        open_courses = []
+        closed_courses = []
+        try:
+            courses = self.query(Course).filter(
+                or_(Course.state == Course.LIVE, Course.state == Course.PUBLISHED),
+                or_(Course.mode == Course.OPEN, Course.mode == Course.CLOSED),
+            )
+            for c in courses:
+                already_member = False
+                for member in c._course_member:
+                    if member.member == user.id:
+                        already_member = True
+                if already_member:
+                    continue
+                if c.mode == Course.OPEN:
+                    open_courses.append(c)
+                else:
+                    closed_courses.append(c)
+        except NoResultFound:
+            print('NO open or closed courses on server ;(')
+        return open_courses, closed_courses
 
-    def get_all_user_course(self, username):
+    def get_all_owner_course(self, username):
         user = self.get_user(username)
         with self as query:
             try:
@@ -106,6 +134,11 @@ class DBBridge:
             except NoResultFound:
                 courses = None
         return courses
+
+    def get_all_study_course(self, username):
+        user = self.get_user(username)
+        user_in = self.query(CourseMembers).filter(CourseMembers.member == user.id)
+        return user_in
 
     def get_lesson_by_stream(self, stream_key, stream_pw):
         return self.activate_lesson(stream_key, stream_pw)
@@ -117,13 +150,13 @@ class DBBridge:
                 lesson = query(Lesson).filter(
                     Lesson.stream_key == stream_key,
                     Lesson.stream_pw == stream_pw,
-                    or_(Lesson.state == Lesson.WAITING, Lesson.state == Lesson.LIVE)
+                    or_(Lesson.state == Lesson.WAITING, Lesson.state == Lesson.LIVE, Lesson.state == Lesson.INTERRUPTED)
                 ).one()
                 accept_start = lesson.start_time - timedelta(minutes=sets.STREAM_WINDOW)
                 accept_end = lesson.start_time + timedelta(minutes=lesson.duration) + \
                              timedelta(minutes=sets.STREAM_WINDOW)
                 if accept_start < datetime.now() < accept_end:
-                    if lesson.state == Lesson.WAITING:
+                    if lesson.state == Lesson.WAITING or lesson.state == Lesson.INTERRUPTED:
                         lesson.state = Lesson.LIVE
                         print('change lesson "{}" state from "{}" to "Live"'.format(lesson.name, lesson.state))
                         if lesson._course.state != Course.LIVE:
@@ -139,7 +172,12 @@ class DBBridge:
     @modify_db
     def stop_lesson(self, stream_key, stream_pw):
         with self as query:
-            lesson = query(Lesson).filter(Lesson.stream_key == stream_key, Lesson.stream_pw == stream_pw)
+            lesson = query(Lesson).filter(Lesson.stream_key == stream_key, Lesson.stream_pw == stream_pw).one()
+            if lesson.state != Lesson.LIVE:
+                # this can`t be possible on normal request
+                return
+            lesson.state = Lesson.INTERRUPTED
+            self.__db_sessions.commit()
 
 
     @modify_db
@@ -166,7 +204,7 @@ class DBBridge:
         # TODO: check if 'l_name' not already exist in lessons 'course_name'
         # TODO: check start_time (not cross with other lessons and in future)
         # TODO: check dur (must be non zero posivite value)
-        course, _ = self.get_course(course_name, username)
+        course, _ = self.get_owner_course(course_name, username)
         l = Lesson(
             name=l_name,
             description=l_descr,
@@ -180,8 +218,27 @@ class DBBridge:
         self.__add_in_db(l)
 
     @modify_db
+    def associate_with_course(self, username, course_name):
+        # TODO: verify if username already member of course_name
+        # TODO: verify if username CAN be a member of course_name
+        user = self.get_user(username)
+        course = self.get_course(course_name)
+        with self as query:
+            try:
+                query(CourseMembers).filter(CourseMembers.course == course.id, CourseMembers.member == user.id).one()
+                return False
+            except NoResultFound:
+                cm = CourseMembers(
+                    course=course.id,
+                    member=user.id,
+                    assign_type=course.mode,
+                )
+                self.__add_in_db(cm)
+                return True
+
+    @modify_db
     def delete_lesson(self, username, course_name, lesson_name):
-        course, lessons = self.get_course(course_name, username)
+        course, lessons = self.get_owner_course(course_name, username)
         for l in lessons:
             if l.name == lesson_name:
                 self.__rm_from_db(l)

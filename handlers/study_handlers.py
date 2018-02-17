@@ -22,19 +22,37 @@ class StudyLiveHandler(BaseStudyHandler):
 
 class StudyFindHandler(BaseStudyHandler):
     def get(self):
-        raise NotImplementedError
-        return self.render('find.html')
+        open_courses, closed_courses = self.dbb.get_all_course(self.get_current_user())
+        return self.render('find.html', open_c=open_courses, closed_c=closed_courses)
 
     def post(self):
-        pass
+        # TODO: must be different behaviour for different: course_type = self.get_argument('courseType')
+        course_name = self.get_argument('courseName')
+        user_name = self.get_current_user()
+        if not self.dbb.associate_with_course(user_name, course_name):
+            # association already exist!!!
+            self.set_status(400)
+
+    def on_finish(self):
+        if self.request.method == 'GET':
+            self.dbb.finish_query()
 
 
 class StudyManageHandler(BaseStudyHandler):
     def get(self):
-        raise NotImplementedError
-        return self.render('manage.html')
+        user_in = self.dbb.get_all_study_course(self.get_current_user())
+        for cm in user_in:
+            course = cm._course
+            print(course.name, course.description)
+            for lesson in course._lesson:
+                print(lesson.name, lesson.description)
+        return self.render('manage.html', user_in=user_in)
 
     def post(self):
         pass
+
+    def on_finish(self):
+        if self.request.method == 'GET':
+            self.dbb.finish_query()
 
 

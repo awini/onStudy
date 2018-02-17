@@ -93,6 +93,27 @@ class StreamUpdateHandler(BaseHandler):
         self.set_status(401)
 
 
+class StreamDoneHandler(BaseHandler):
+
+    def check_xsrf_cookie(self):
+        return True
+
+    def get(self):
+        self.set_status(404)
+
+    def post(self):
+        pphrs = self.get_argument('pphrs', default=None)  # pphrs can be only in streamer side
+        stream_key = self.get_argument('name', default=None)
+        key = self.get_argument('key', default=None)  # key can be only in client side
+        if pphrs:
+            #  streamer send DONE
+            print('interrupt lesson ""'.format(stream_key))
+            self.dbb.stop_lesson(stream_key, pphrs)
+        elif key:
+            #  client send DONE
+            pass
+
+
 class StreamTstHandler(tornado.web.RequestHandler):
 
     @tornado.web.authenticated

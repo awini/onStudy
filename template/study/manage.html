@@ -5,6 +5,45 @@
 {% block content %}
 
 <br><br><br><br>
-Manage
+{% if user_in %}
+<p>Study Courses:</p>
 
+<table style="width:80%">
+  <tr>
+    <th>Course Name</th>
+    <th>Course Description</th>
+    <th>Course Autor</th>
+    <th>Course Mode</th>
+    <th>Course State</th>
+    <th>Lesson Name</th>
+    <th>Lesson Description</th>
+    <th>Lesson Start Time</th>
+    <th>Lesson Duration</th>
+    <th>Lesson State</th>
+
+  </tr>
+    {% for cm in user_in %}
+        {% for lesson in cm._course._lesson %}
+          <tr>
+            <td>{{ cm._course.name }}</td>
+            <td>{{ cm._course.description }}</td>
+            <td>{{ cm._course._owner.name }}</td>
+            <td>{{ cm._course.mode }}</td>
+            <td>{{ cm._course.state }}</td>
+            <td>{{ lesson.name }}</td>
+            <td>{{ lesson.description }}</td>
+            <td>{{ lesson.start_time }}</td>
+            <td>{{ lesson.duration }}</td>
+            {% if lesson.state == 'Live' %}
+            <td><a href="/stream?stream_key={{ lesson.stream_key }}">Watch Now!</a> </td>
+              {% else %}
+            <td>{{ lesson.state }}</td>
+              {% end %}
+          </tr>
+        {% end %}
+    {% end %}
+</table>
+{% else %}
+<p> You don`t have any study course</p>
+{% end %}
 {% end %}

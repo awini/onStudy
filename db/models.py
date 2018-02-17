@@ -17,7 +17,7 @@ class User(Base):
     email = Column(String(length=60))
 
     _course = relationship('Course', back_populates='_owner')
-    _lesson_member = relationship("LessonMembers", back_populates="_member")
+    _course_member = relationship("CourseMembers", back_populates="_member")
 
 
 class Course(Base):
@@ -53,6 +53,7 @@ class Course(Base):
 
     _owner = relationship("User", back_populates="_course")
     _lesson = relationship("Lesson", back_populates="_course")
+    _course_member = relationship('CourseMembers', back_populates='_course')
 
 
 class Lesson(Base):
@@ -82,18 +83,17 @@ class Lesson(Base):
     stream_pw  = Column(String(length=12))
 
     _course = relationship("Course", back_populates="_lesson")
-    _lesson_member = relationship("LessonMembers", back_populates="_lesson")
 
 
-class LessonMembers(Base):
-    __tablename__ = 'lesson_member'
+class CourseMembers(Base):
+    __tablename__ = 'course_member'
 
     id = Column(Integer, primary_key=True)
 
-    lesson = Column(Integer, ForeignKey('lesson.id'))
+    course = Column(Integer, ForeignKey('course.id'))
     member = Column(Integer, ForeignKey('user.id'))
     assign_type = Column(Choice(Course.COURSE_MODES))
 
-    _lesson = relationship("Lesson", back_populates="_lesson_member")
-    _member = relationship("User", back_populates="_lesson_member")
+    _course = relationship("Course", back_populates="_course_member")
+    _member = relationship("User", back_populates="_course_member")
 

@@ -40,7 +40,7 @@ class ManageCourseHandler(BaseCourseHandler):
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
         course_name = self.get_argument('course')
-        course, lessons = self.dbb.get_course(course_name, self.get_current_user())
+        course, lessons = self.dbb.get_owner_course(course_name, self.get_current_user())
         return self.render('manage_course.html', course=course, lessons=lessons)
 
     @tornado.web.authenticated
@@ -57,7 +57,7 @@ class ManageCourseHandler(BaseCourseHandler):
 class CourseHandler(BaseCourseHandler):
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
-        user_courses = self.dbb.get_all_user_course(self.get_current_user())
+        user_courses = self.dbb.get_all_owner_course(self.get_current_user())
         return self.render('courses.html', courses=user_courses)
 
 
