@@ -41,11 +41,6 @@ class StudyFindHandler(BaseStudyHandler):
 class StudyManageHandler(BaseStudyHandler):
     def get(self):
         user_in = self.dbb.get_all_study_course(self.get_current_user())
-        for cm in user_in:
-            course = cm._course
-            print(course.name, course.description)
-            for lesson in course._lesson:
-                print(lesson.name, lesson.description)
         return self.render('manage.html', user_in=user_in)
 
     def post(self):

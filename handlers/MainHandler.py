@@ -2,6 +2,9 @@ from handlers.BaseHandler import BaseHandler
 import tornado.web
 from tornado import gen, web, httpclient
 
+from logging import getLogger
+log = getLogger(__name__)
+
 
 class MainHandler(BaseHandler):
 

@@ -5,6 +5,9 @@ from datetime import datetime
 
 from settings import sets
 
+from logging import getLogger
+log = getLogger(__name__)
+
 COURSE_MODES = Course.COURSE_MODES
 
 

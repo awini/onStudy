@@ -5,6 +5,8 @@ import tornado.web
 from handlers.BaseHandler import BaseHandler
 from settings import sets
 
+from logging import getLogger
+log = getLogger(__name__)
 
 # TODO: add support for on_publish_done nginx directive (change lesson state to ended)
 
@@ -37,26 +39,25 @@ class StreamAuthHandler(BaseHandler):
             lesson = self.dbb.activate_lesson(stream_key, stream_pw)
             if lesson:
                 # TODO: WHEN lesson must be close???
-                print('server success auth')
+                log.info('server success auth')
                 self.set_status(200)
             else:
-                print('Server false auth (wrong user/stream key)')
+                log.info('Server false auth (wrong user/stream key)')
                 self.set_status(401)
             return
 
         elif call_type == 'play':
             #  client parse
             if self.request.arguments['key'][0].decode() in StreamAuthHandler.user_keys.values():
-                print('Client success auth')
+                log.info('Client success auth')
                 self.set_status(200)
             else:
-                print('Client false auth')
+                log.info('Client false auth')
                 self.set_status(401)
             return
 
-        print(self.request.arguments)
         self.set_status(401)
-        print('unknown call type "{}"'.format(call_type))
+        log.error('unknown call type "{}"'.format(call_type))
 
 
 class StreamUpdateHandler(BaseHandler):
@@ -88,8 +89,7 @@ class StreamUpdateHandler(BaseHandler):
             self.set_status(200)
             return
 
-        print(self.request.arguments)
-        print('unknown call type "{}"'.format(call_type))
+        log.error('unknown call type "{}"'.format(call_type))
         self.set_status(401)
 
 
@@ -107,7 +107,7 @@ class StreamDoneHandler(BaseHandler):
         key = self.get_argument('key', default=None)  # key can be only in client side
         if pphrs:
             #  streamer send DONE
-            print('interrupt lesson ""'.format(stream_key))
+            log.info('interrupt lesson ""'.format(stream_key))
             self.dbb.stop_lesson(stream_key, pphrs)
         elif key:
             #  client send DONE

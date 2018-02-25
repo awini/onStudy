@@ -1,8 +1,12 @@
 # coding: utf-8
 import sys
-from os.path import join
 
 from settings import sets
+
+import log_config
+from logging import getLogger
+log_config.load_config(debug=sets.DEBUG)
+log = getLogger('main')
 
 
 if __name__ == "__main__" and sets.DEBUG:
@@ -73,6 +77,8 @@ class Application(tornado.web.Application):
 
 
 if __name__ == "__main__":
+
+    
     print('server on 0.0.0.0:8888 started.')
     app = Application()
     app.listen(8888)

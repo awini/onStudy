@@ -3,11 +3,14 @@ import sys
 from subprocess import call, DEVNULL, check_output, Popen, PIPE
 from datetime import datetime
 from os.path import join
+from pathlib import Path
 
 
 def init_all():
     print('[ INIT ]')
     init_start = datetime.now()
+
+    check_log_dir()
 
     print('check requirements...')
     _text = install(sys.executable, "-m pip install -r requirements.txt")
@@ -74,3 +77,9 @@ def com2str(command):
     if type(command) in (list, tuple):
         command = ' '.join(command)
     return command
+
+
+def check_log_dir():
+    log_dir = Path('logs')
+    if not log_dir.is_dir():
+        log_dir.mkdir()
