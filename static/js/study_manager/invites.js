@@ -16,14 +16,14 @@ $(document).ready(function(){
         return cookieValue;
     }
 
-    $("#courseAction").click(function(event) {
+    $(".actBtn").click(function(event) {
         event.preventDefault();
         if (!confirm("Are you sure?")){
             return
         }
         var sendData = {
-            courseName: $("#addLessonCursename").val(),
-            action: $(this).val(),
+            courseName: $(this).val(),
+            action: $(this).attr('action'),
         }
 
         $.ajaxSetup({
@@ -40,32 +40,6 @@ $(document).ready(function(){
               },
               error: function(){
                   alert('Ошибка! Какая-нибудь...');
-              },
-        });
-    });
-
-    $("#inviteAction").click(function(event) {
-        event.preventDefault();
-        var userToInvite = prompt("Please enter user name to invite");
-        var sendData = {
-            courseName: $("#addLessonCursename").val(),
-            userToInvite: userToInvite,
-            action: $(this).val(),
-        }
-
-        $.ajaxSetup({
-            headers: { "X-CSRFToken": getCookie("_xsrf") }
-        });
-        $.ajax({
-              url: "",
-              type: "post",
-              data: sendData,
-              datatype: 'json',
-              success: function(data){
-                    alert('Success!');
-              },
-              error: function(data){
-                  alert(data['responseText']);
               },
         });
     });

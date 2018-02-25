@@ -55,6 +55,9 @@ State: {{ course.state }}<br>
         <button type="button" id="courseAction" value="Published">Publish </button>
     {% else %}
         <button type="button" id="courseAction" value="Interrupted">Cancel Course</button>
+        {% if course.mode == course.PRIVATE %}
+            <br><br><button type="button" id="inviteAction" value="InviteMember">Invite Friend</button>
+        {% end %}
     {% end %}
 
 <div class="modal fade" id="addLessonModal" role="dialog">

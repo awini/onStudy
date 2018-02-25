@@ -2,6 +2,7 @@ from handlers.BaseHandler import BaseHandler
 from db.models import Course
 import tornado.web
 from datetime import datetime
+import json
 
 from settings import sets
 
@@ -37,11 +38,13 @@ class ManageCourseHandler(BaseCourseHandler):
         self.COURSE_ACTIONS = (
             'Published',
             'Interrupted',
+            'InviteMember',
         )
         super().__init__(*args, **kwargs)
 
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
+        # TODO: add showing registred/invited users table for private/closed course
         course_name = self.get_argument('course')
         course, lessons = self.dbb.get_owner_course(course_name, self.get_current_user())
         return self.render('manage_course.html', course=course, lessons=lessons)
@@ -54,7 +57,17 @@ class ManageCourseHandler(BaseCourseHandler):
         if action not in self.COURSE_ACTIONS:
             self.set_status(400)
             return
-        self.dbb.change_course_state(user, course_name, action)
+        if action == 'InviteMember':
+            user_to_invite = self.get_argument('userToInvite')
+            err = self.dbb.create_invite(course_name, user, user_to_invite)
+            if err:
+                self.write(err)
+                self.set_status(400)
+                log.debug('Failed adding invite')
+            else:
+                log.debug('Success adding invite')
+        else:
+            self.dbb.change_course_state(user, course_name, action)
 
 
 class CourseHandler(BaseCourseHandler):

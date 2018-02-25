@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, ForeignKey, Text, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, Text, DateTime, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from db.custom_types import Choice
@@ -18,6 +18,7 @@ class User(Base):
 
     _course = relationship('Course', back_populates='_owner')
     _course_member = relationship("CourseMembers", back_populates="_member")
+    _course_invites = relationship("CourseInvites", back_populates="_member")
 
 
 class Course(Base):
@@ -54,6 +55,7 @@ class Course(Base):
     _owner = relationship("User", back_populates="_course")
     _lesson = relationship("Lesson", back_populates="_course")
     _course_member = relationship('CourseMembers', back_populates='_course')
+    _course_invites = relationship("CourseInvites", back_populates="_course")
 
 
 class Lesson(Base):
@@ -97,3 +99,15 @@ class CourseMembers(Base):
     _course = relationship("Course", back_populates="_course_member")
     _member = relationship("User", back_populates="_course_member")
 
+
+class CourseInvites(Base):
+    __tablename__ = 'course_invites'
+
+    id = Column(Integer, primary_key=True)
+    course = Column(Integer, ForeignKey('course.id'))
+    member = Column(Integer, ForeignKey('user.id'))
+
+    __table_args__ = UniqueConstraint('course', 'member', name='_course_course_uc'),  # must be tupple!
+
+    _course = relationship("Course", back_populates="_course_invites")
+    _member = relationship("User", back_populates="_course_invites")

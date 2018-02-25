@@ -1,6 +1,9 @@
 from handlers.BaseHandler import BaseHandler
 from settings import sets
 
+from logging import getLogger
+log = getLogger(__name__)
+
 
 class BaseStudyHandler(BaseHandler):
     def get_template_path(self):
@@ -45,6 +48,28 @@ class StudyManageHandler(BaseStudyHandler):
 
     def post(self):
         pass
+
+    def on_finish(self):
+        if self.request.method == 'GET':
+            self.dbb.finish_query()
+
+
+class StudyInviteHandler(BaseStudyHandler):
+    def get(self):
+        invites = self.dbb.get_user_invites(self.get_current_user())
+        return self.render('invite.html', invites=invites)
+
+    def post(self):
+        username = self.get_current_user()
+        action = self.get_argument('action')
+        course_name = self.get_argument('courseName')
+        if action == 'accept':
+            self.dbb.invite_on_accept(course_name, username)
+        elif action == 'decline':
+            self.dbb.invite_on_decline(course_name, username)
+        else:
+            log.warning('Unknown action {}'.format(action))
+            self.set_status(400)
 
     def on_finish(self):
         if self.request.method == 'GET':

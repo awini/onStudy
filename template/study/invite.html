@@ -1,0 +1,29 @@
+{% extends "../base.html" %}
+
+{% block title %}Home{% end %}
+
+{% block content %}
+
+<br><br><br><br>
+
+<table style="width:40%">
+    <tr>
+      <th>Course Name</th>
+      <th>Course Owner</th>
+      <th>Actions</th>
+    </tr>
+{% for i in invites %}
+    <tr>
+      <td>{{ i._course.name }}</td>
+      <td>{{ i._course._owner.name }}</td>
+      <td>
+        <button type="button" class="actBtn" value="{{ i._course.name }}" action="accept">Accept</button>
+        <button type="button" class="actBtn" value="{{ i._course.name }}" action="decline">Decline</button>
+      </td>
+    </tr>
+{% end %}
+</table>
+
+
+<script type="text/javascript" src="/static/js/study_manager/invites.js"></script>
+{% end %}

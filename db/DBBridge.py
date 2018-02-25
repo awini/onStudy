@@ -3,13 +3,16 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import or_
+from sqlalchemy.exc import IntegrityError
 
 from uuid import uuid4
 from datetime import datetime, timedelta
 
-from db.models import User, Lesson, CourseMembers, Course
+from db.models import User, Lesson, CourseMembers, Course, CourseInvites
 from settings import sets
 
+from logging import getLogger
+log = getLogger(__name__)
 
 DB_SESSIONS = scoped_session(sessionmaker(bind=create_engine(sets.DB_SCHEME + sets.DB_NAME)))
 
@@ -143,6 +146,27 @@ class DBBridge:
     def get_lesson_by_stream(self, stream_key, stream_pw):
         return self.activate_lesson(stream_key, stream_pw)
 
+    def get_user_invites(self, username):
+        user = self.get_user(username)
+        invites = self.query(CourseInvites).filter(CourseInvites.member == user.id)
+        return invites
+
+    @modify_db
+    def invite_on_accept(self, course_name, invited_user):
+        self.invite_on_decline(course_name, invited_user)
+        self.associate_with_course(invited_user, course_name)
+
+    @modify_db
+    def invite_on_decline(self, course_name, invited_user):
+        user = self.get_user(invited_user)
+        with self as query:
+            user_course = query(CourseInvites).filter(CourseInvites.member == user.id)
+            for c in user_course:
+                if c._course.name == course_name:
+                    self.__rm_from_db(c)
+                    return
+        log.warning('No association for user "{}" and course "{}" in CourseInvites'.format(invited_user, course_name))
+
     @modify_db
     def activate_lesson(self, stream_key, stream_pw):
         with self as query:
@@ -179,6 +203,21 @@ class DBBridge:
             lesson.state = Lesson.INTERRUPTED
             self.__db_sessions.commit()
 
+    @modify_db
+    def create_invite(self, course_name, owner, user_to_invite):
+        # TODO: check if user_to_invite already invited to this course
+        with self as query:
+            course = query(Course).filter(Course.name == course_name).one()
+            if course._owner.name != owner:
+                return 'Bad Request'
+        user = self.get_user(user_to_invite)
+        if not user:
+            return 'User with that name doesn`t exist!'
+        i = CourseInvites(course=course.id, member=user.id)
+        try:
+            self.__add_in_db(i)
+        except IntegrityError:
+            return 'User "{}" already invited to course "{}"'.format(user_to_invite, course_name)
 
     @modify_db
     def create_user(self, username, password, email):
@@ -234,6 +273,7 @@ class DBBridge:
                     assign_type=course.mode,
                 )
                 self.__add_in_db(cm)
+                log.info('Associate user "{}" with course "{}"'.format(username, course_name))
                 return True
 
     @modify_db
