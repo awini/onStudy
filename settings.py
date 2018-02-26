@@ -4,10 +4,18 @@ from os.path import join, dirname
 
 class _Sets:
 
-    DEBUG = True
+    _DEBUG = False
     TESTING = False
 
     BOWER_COMPONENTS = 'bower_components'
+
+    @property
+    def DEBUG(self):
+        return self._DEBUG
+
+    @DEBUG.setter
+    def DEBUG(self, val):
+        self._DEBUG = val
 
     @property
     def DB_NAME(self):

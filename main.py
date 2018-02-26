@@ -3,23 +3,27 @@ import sys
 
 from settings import sets
 
-import log_config
-from logging import getLogger
-log_config.load_config(debug=sets.DEBUG)
-log = getLogger('main')
 
-
-if __name__ == "__main__" and sets.DEBUG:
+if __name__ == "__main__":
     for a in ('help', '-h', '--help'):
         if a in sys.argv:
             print('''python main.py [init]\n\nCommands:
-    init     - for init project on start or reinit on changed requirements.''')
+    init     - for init project on start or reinit on changed requirements.
+    debug    - for debug in terminal.''')
             sys.exit(0)
+
+    if 'debug' in sys.argv:
+        sets.DEBUG = True
 
     if 'init' in sys.argv:
         from scripts.init import init_all
         init_all()
 
+
+import log_config
+import logging
+log_config.load_config(debug=sets.DEBUG)
+log = logging.getLogger('main')
 
 import tornado.ioloop
 import tornado.web

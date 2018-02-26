@@ -52,6 +52,11 @@ config = {
             'level': 0,
             'propagate': False,
         },
+        'sqlalchemy.engine': {
+            'handlers': handlers,
+            'level': 0,
+            'propagate': False,
+        }
     },
 }
 
@@ -69,3 +74,4 @@ def load_config(debug=False):
 def set_level(lvl):
     for loggers in config['loggers']:
         config['loggers'][loggers]['level'] = lvl
+    #logging.getLogger('sqlalchemy.engine').setLevel(lvl)
