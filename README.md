@@ -26,6 +26,10 @@ After that you can use simple start:
 
 Then open in browser page http://127.0.0.1:8888.
 
+Use this start variant if you want see debug messages:
+
+`python main.py debug`
+
 
 ## Testing
 For start project tests run command:
