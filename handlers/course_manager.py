@@ -46,8 +46,8 @@ class ManageCourseHandler(BaseCourseHandler):
     def get(self, *args, **kwargs):
         # TODO: add showing registred/invited users table for private/closed course
         course_name = self.get_argument('course')
-        course, lessons = self.dbb.get_owner_course(course_name, self.get_current_user())
-        return self.render('manage_course.html', course=course, lessons=lessons)
+        course, lessons, members = self.dbb.get_owner_course(course_name, self.get_current_user())
+        return self.render('manage_course.html', course=course, lessons=lessons, members=members)
 
     @tornado.web.authenticated
     def post(self, *args, **kwargs):

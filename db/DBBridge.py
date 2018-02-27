@@ -70,11 +70,14 @@ class DBBridge:
     def get_owner_course(self, course_name, username):
         user = self.get_user(username)
         lessons = []
+        members = []
         with self as query:
             course = query(Course).filter(Course.name == course_name, Course.owner == user.id).one()
             for l in course._lesson:
                 lessons.append(l)
-        return course, lessons
+            for member in course._course_member:
+                members.append(member._member.name)
+        return course, lessons, members
 
     def get_course(self, course_name):
         with self as query:
@@ -278,7 +281,7 @@ class DBBridge:
 
     @modify_db
     def delete_lesson(self, username, course_name, lesson_name):
-        course, lessons = self.get_owner_course(course_name, username)
+        course, lessons, _ = self.get_owner_course(course_name, username)
         for l in lessons:
             if l.name == lesson_name:
                 self.__rm_from_db(l)

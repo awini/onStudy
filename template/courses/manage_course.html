@@ -60,6 +60,23 @@ State: {{ course.state }}<br>
         {% end %}
     {% end %}
 
+<br><br>
+
+{% if course.mode != course.OPEN %}
+    {% if members %}
+        <p> Registred members: </p>
+        <ul>
+          {% for m in members %}
+            <li> {{ m }} </li>
+          {% end %}
+        </ul>
+    {% else %}
+        <p> No one registred no your course yet!</p>
+    {% end %}
+{% end %}
+
+<br><br>
+
 <div class="modal fade" id="addLessonModal" role="dialog">
 <div class="modal-dialog">
 <div class="modal-content">
