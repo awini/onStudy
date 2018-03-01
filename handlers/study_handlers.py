@@ -43,7 +43,7 @@ class StudyFindHandler(BaseStudyHandler):
 
 class StudyManageHandler(BaseStudyHandler):
     def get(self):
-        user_in = self.dbb.get_all_study_course(self.get_current_user())
+        user_in = self.dbb.CourseMembers.get_all_study_course(self.get_current_user())
         return self.render('manage.html', user_in=user_in)
 
     def post(self):

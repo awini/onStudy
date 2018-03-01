@@ -17,6 +17,21 @@ log = getLogger(__name__)
 DB_SESSIONS = scoped_session(sessionmaker(bind=create_engine(sets.DB_SCHEME + sets.DB_NAME)))
 
 
+class DbHandlerBase:
+
+    def __init__(self, dbb):
+        self.dbb = dbb
+
+class CourseMembersHandler(DbHandlerBase):
+
+    def get_all_study_course(self, username):
+        user = self.dbb.get_user(username)
+        user_in = self.dbb.query(CourseMembers).filter(CourseMembers.member == user.id)
+        return user_in
+
+
+
+
 def modify_db(func):
     def wrapper(*args, **kwargs):
         try:
@@ -38,6 +53,7 @@ class DBBridge:
     def __init__(self):
         if DBBridge.__instance:
             raise BaseException('Use get_instance method!')
+        self.CourseMembers = CourseMembersHandler(self)
 
     @staticmethod
     def get_instance():
@@ -141,8 +157,8 @@ class DBBridge:
                 courses = None
         return courses
 
-    def get_all_study_course(self, username):
-        return CourseMembers.get_all_study_course(self, username)
+    # def get_all_study_course(self, username):
+    #     return CourseMembers.get_all_study_course(self, username)
 
     def get_lesson_by_stream(self, stream_key, stream_pw):
         return self.activate_lesson(stream_key, stream_pw)
@@ -307,4 +323,3 @@ class DBBridge:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.finish_query()
-
