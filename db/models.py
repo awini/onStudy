@@ -99,6 +99,12 @@ class CourseMembers(Base):
     _course = relationship("Course", back_populates="_course_member")
     _member = relationship("User", back_populates="_course_member")
 
+    @staticmethod
+    def get_all_study_course(dbb, username):
+        user = dbb.get_user(username)
+        user_in = dbb.query(CourseMembers).filter(CourseMembers.member == user.id)
+        return user_in
+
 
 class CourseInvites(Base):
     __tablename__ = 'course_invites'

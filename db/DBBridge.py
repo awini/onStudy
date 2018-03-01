@@ -142,9 +142,7 @@ class DBBridge:
         return courses
 
     def get_all_study_course(self, username):
-        user = self.get_user(username)
-        user_in = self.query(CourseMembers).filter(CourseMembers.member == user.id)
-        return user_in
+        return CourseMembers.get_all_study_course(self, username)
 
     def get_lesson_by_stream(self, stream_key, stream_pw):
         return self.activate_lesson(stream_key, stream_pw)
