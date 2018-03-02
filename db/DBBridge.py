@@ -61,6 +61,12 @@ class DBBridge:
             return DBBridge.__instance
         return DBBridge()
 
+    @staticmethod
+    def get_session(func):
+        def wrapper(*args, **kwargs):
+            return func(DBBridge.__db_sessions, *args, **kwargs)
+        return wrapper
+
     def query(self, *args, **kwargs):
         return DBBridge.__db_sessions.query(*args, **kwargs)
 

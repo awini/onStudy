@@ -9,6 +9,10 @@ log = getLogger(__name__)
 class MainHandler(BaseHandler):
 
     def get(self):
+        #  code above just example of working with new style model query
+        username = self.get_current_user()
+        if username:
+            log.warning(self.User.get_user(username))
         return self.render("main.html")
 
 
