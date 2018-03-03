@@ -3,8 +3,8 @@ from subprocess import call
 
 
 def install_frontend():
-    run('npm i -g bower', check=lambda: not exists("bower_components"))
-    run('bower init', check=lambda: not exists("bower_components") or not exists("bower.json"))
+    run('npm i -g bower', check=lambda: not exists("bower.json"))
+    run('bower init', check=lambda: not exists("bower.json"))
 
     add_module('bootstrap')
     add_module('jquery')

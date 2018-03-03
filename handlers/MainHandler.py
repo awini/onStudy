@@ -5,6 +5,8 @@ from tornado import gen, web, httpclient
 from logging import getLogger
 log = getLogger(__name__)
 
+from datetime import datetime
+
 
 class MainHandler(BaseHandler):
 
@@ -13,7 +15,14 @@ class MainHandler(BaseHandler):
         username = self.get_current_user()
         if username:
             log.warning(self.User.get_user(username))
-        return self.render("main.html")
+
+        # TODO: put here info from db
+        open_lecs = [
+            {'title':'frontend anywere', 'course':'frontend', 'lector':'Kirill', 'time':'today 16:00', 'long':'01:00'},
+            {'title':'powerful alghoritms', 'course':'c++', 'lector':'Alex', 'time':'tomorrow 20:00', 'long':'01:00'}
+        ]
+
+        return self.render("main.html", open_lecs=open_lecs)
 
 
 class AboutHandler(BaseHandler):
