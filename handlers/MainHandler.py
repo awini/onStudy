@@ -9,7 +9,13 @@ log = getLogger(__name__)
 class MainHandler(BaseHandler):
 
     def get(self):
-        return self.render("main.html")
+        # TODO: put here info from db
+        open_lecs = [
+            {'title':'frontend anywere', 'course':'frontend', 'lector':'Kirill', 'time':'today 16:00', 'long':'01:00'},
+            {'title':'powerful alghoritms', 'course':'c++', 'lector':'Alex', 'time':'tomorrow 20:00', 'long':'01:00'}
+        ]
+
+        return self.render("main.html", open_lecs=open_lecs)
 
 
 class AboutHandler(BaseHandler):

@@ -14,6 +14,16 @@
     </div>
 
     <div class="container">
+      {% if len(open_lecs) > 0 %}
+      <div class="row">
+      {% for lec in open_lecs %}
+        <div class="col-md-4">
+          <h3>{{ lec['title'] }}</h3>
+          <p class="lead">{{ lec['course'] }}<a class='float-right'>{{ lec['time'] }} / {{ lec['lector'] }}</a></p>
+        </div>
+      {% end %}
+      </div>
+      {% end %}
       <!-- Example row of columns -->
       <div class="row">
         <div class="col-md-4">

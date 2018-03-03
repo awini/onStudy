@@ -26,6 +26,10 @@ class BaseHandler(RequestHandler):
         return
 
     @property
+    def db(self):
+        return self.dbb
+
+    @property
     def dbb(self):
         return DBBridge.get_instance()
 
