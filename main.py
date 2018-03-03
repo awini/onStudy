@@ -63,9 +63,9 @@ class Application(tornado.web.Application):
             (r"/course/lesson", LessonHandler),
 
             (r"/study/live", StudyLiveHandler),
-            ("/study/find", StudyFindHandler),
-            ("/study/manage", StudyManageHandler),
-            ("/study/invite", StudyInviteHandler),
+            (r"/study/find", StudyFindHandler),
+            (r"/study/manage", StudyManageHandler),
+            (r"/study/invite", StudyInviteHandler),
         ]
 
         settings = {

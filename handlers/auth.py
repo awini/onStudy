@@ -14,7 +14,7 @@ class LoginHandler(BaseHandler):
         return sets.TEMPLATE_PATH + 'auth'
 
     def post(self):
-        user = self.dbb.get_user(self.get_argument('username'))
+        user = self.User.get(self.get_argument('username'))
         if not user:
             self.render('login.html', msg='Wrong user/password')
             return
@@ -54,14 +54,14 @@ class RegisterHandler(BaseHandler):
         err = ''
         if password != password2:
             err += 'Passworm mistmatch\n'
-        if self.dbb.get_user(user):
+        if self.User.get(user):
             err += 'User with this name already exist\n'
-        if self.dbb.get_user_by_email(email):
+        if self.User.get_by_email(email):
             err += 'This email already used\n'
         if err:
             self.render('register.html', msg=err)
             return
-        self.dbb.create_user(user, self.generate_password(password), email)
+        self.User.create(user, self.generate_password(password), email)
         self.render('login.html', msg='Успешная регистрация!')
 
     def get_template_path(self):

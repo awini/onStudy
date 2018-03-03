@@ -36,7 +36,7 @@ class StreamAuthHandler(BaseHandler):
             stream_key = self.get_argument('name')
             stream_pw = self.get_argument('pphrs')
 
-            lesson = self.dbb.activate_lesson(stream_key, stream_pw)
+            lesson = self.Lesson.activate_lesson(stream_key, stream_pw)
             if lesson:
                 # TODO: WHEN lesson must be close???
                 log.info('server success auth')
@@ -79,7 +79,7 @@ class StreamUpdateHandler(BaseHandler):
         elif call_type == 'update_publish':
             stream_key = self.get_argument('name')
             stream_pw = self.get_argument('pphrs')
-            lesson = self.dbb.get_lesson_by_stream(stream_key, stream_pw)
+            lesson = self.Lesson.get_by_keys(stream_key, stream_pw)
             pass_time = (datetime.now() - lesson.start_time).total_seconds() / 60
             if 0 < pass_time < (lesson.duration + sets.STREAM_WINDOW):
                 self.set_status(200)
@@ -108,7 +108,7 @@ class StreamDoneHandler(BaseHandler):
         if pphrs:
             #  streamer send DONE
             log.info('interrupt lesson ""'.format(stream_key))
-            self.dbb.stop_lesson(stream_key, pphrs)
+            self.Lesson.stop_lesson(stream_key, pphrs)
         elif key:
             #  client send DONE
             pass

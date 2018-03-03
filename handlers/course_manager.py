@@ -28,7 +28,7 @@ class CreateCourseHandler(BaseCourseHandler):
         course_description = self.get_argument('courseDescription')
         mode = self.get_argument('courseMode')
 
-        self.dbb.create_course(self.get_current_user(), course_name, course_description, mode)
+        self.Course.create(self.get_current_user(), course_name, course_description, mode)
         self.set_status(200)
 
 
@@ -46,7 +46,7 @@ class ManageCourseHandler(BaseCourseHandler):
     def get(self, *args, **kwargs):
         # TODO: add showing registred/invited users table for private/closed course
         course_name = self.get_argument('course')
-        course, lessons, members = self.dbb.get_owner_course(course_name, self.get_current_user())
+        course, lessons, members = self.Course.get_by_owner(course_name, self.get_current_user())
         return self.render('manage_course.html', course=course, lessons=lessons, members=members)
 
     @tornado.web.authenticated
@@ -59,7 +59,7 @@ class ManageCourseHandler(BaseCourseHandler):
             return
         if action == 'InviteMember':
             user_to_invite = self.get_argument('userToInvite')
-            err = self.dbb.create_invite(course_name, user, user_to_invite)
+            err = self.CourseInvites.create_invite(course_name, user, user_to_invite)
             if err:
                 self.write(err)
                 self.set_status(400)
@@ -67,13 +67,13 @@ class ManageCourseHandler(BaseCourseHandler):
             else:
                 log.debug('Success adding invite')
         else:
-            self.dbb.change_course_state(user, course_name, action)
+            self.Course.change_state(user, course_name, action)
 
 
 class CourseHandler(BaseCourseHandler):
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
-        user_courses = self.dbb.get_all_owner_course(self.get_current_user())
+        user_courses = self.Course.get_all_by_owner(self.get_current_user())
         return self.render('courses.html', courses=user_courses)
 
 
@@ -99,7 +99,7 @@ class LessonHandler(BaseHandler):
         dur = self.get_argument('lessonDuration')
         course_name = self.get_argument('courseName')
 
-        self.dbb.create_lesson(
+        self.Lesson.create_lesson(
             self.get_current_user(),
             course_name,
             les_name,
@@ -112,7 +112,7 @@ class LessonHandler(BaseHandler):
         course_name = self.get_argument('courseName')
         lesson_name = self.get_argument('lessonName')
         username = self.get_current_user()
-        self.dbb.delete_lesson(username, course_name, lesson_name)
+        self.Lesson.delete_lesson(username, course_name, lesson_name)
 
     def __change_lesson(self):
         print('change lesson')
