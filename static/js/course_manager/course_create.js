@@ -47,8 +47,8 @@ $(document).ready(function(){
                     alert('Курс создан!');
                     window.location.href = '/course/manage?course=' + sendData['courseName'];
               },
-              error: function(){
-                  alert('Ошибка! Какая-нибудь...');
+              error: function(data){
+                  alert(data['responseText']);
               },
         });
 

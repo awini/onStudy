@@ -1,15 +1,13 @@
+import tornado.web
+
+from datetime import datetime
+
 from handlers.BaseHandler import BaseHandler
 from db.models import Course
-import tornado.web
-from datetime import datetime
-import json
-
 from settings import sets
 
 from logging import getLogger
 log = getLogger(__name__)
-
-COURSE_MODES = Course.COURSE_MODES
 
 
 class BaseCourseHandler(BaseHandler):
@@ -20,7 +18,7 @@ class BaseCourseHandler(BaseHandler):
 class CreateCourseHandler(BaseCourseHandler):
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
-        return self.render('create_course.html', modes=COURSE_MODES)
+        return self.render('create_course.html', modes=Course.COURSE_MODES)
 
     @tornado.web.authenticated
     def post(self, *args, **kwargs):
@@ -28,8 +26,12 @@ class CreateCourseHandler(BaseCourseHandler):
         course_description = self.get_argument('courseDescription')
         mode = self.get_argument('courseMode')
 
-        self.Course.create(self.get_current_user(), course_name, course_description, mode)
-        self.set_status(200)
+        course = self.Course.create(self.get_current_user(), course_name, course_description, mode)
+        if course:
+            self.set_status(200)
+        else:
+            self.set_status(400)
+            self.write('Course with this name already exist')
 
 
 class ManageCourseHandler(BaseCourseHandler):

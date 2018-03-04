@@ -57,7 +57,7 @@ class CourseHandler(DbHandlerBase):
     @staticmethod
     @DBBridge.query_db
     def get(session, course_name):
-        course = session.query(Course).filter(Course.name == course_name).one()
+        course = session.query(Course).filter(Course.name == course_name).one_or_none()
         return course
 
     @staticmethod
@@ -122,17 +122,18 @@ class CourseHandler(DbHandlerBase):
     @staticmethod
     @DBBridge.modife_db
     def create(session, username, course_name, course_descr, mode):
-        # TODO: check if course_name already exist
         user = UserHandler.get(username)
 
-        c = Course(
-            name=course_name,
-            description=course_descr,
-            owner= user.id,
-            mode=mode,
-            state=Course.CREATED,
-        )
-        session.add(c)
+        c = None
+        if not CourseHandler.get(course_name):
+            c = Course(
+                name=course_name,
+                description=course_descr,
+                owner= user.id,
+                mode=mode,
+                state=Course.CREATED,
+            )
+            session.add(c)
         return c
 
     @staticmethod
