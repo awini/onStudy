@@ -62,6 +62,11 @@ class CourseHandler(DbHandlerBase):
 
     @staticmethod
     @DBBridge.query_db
+    def get_by_invite_url(session, invite_url):
+        return session.query(Course).filter(Course.invite_url == invite_url).one_or_none()
+
+    @staticmethod
+    @DBBridge.query_db
     def get_by_stream_key(session, key):
         return session.query(Course).filter(Course.stream_key == key).one_or_none()
 
@@ -126,12 +131,14 @@ class CourseHandler(DbHandlerBase):
 
         c = None
         if not CourseHandler.get(course_name):
+            invite_url = str(uuid4()) if mode == Course.PRIVATE else None
             c = Course(
                 name=course_name,
                 description=course_descr,
                 owner= user.id,
                 mode=mode,
                 state=Course.CREATED,
+                invite_url=invite_url,
             )
             session.add(c)
         return c
@@ -139,7 +146,6 @@ class CourseHandler(DbHandlerBase):
     @staticmethod
     @DBBridge.modife_db
     def associate_with_course(session, username, course_name):
-        # TODO: verify if username already member of course_name
         # TODO: verify if username CAN be a member of course_name
         user = UserHandler.get(username)
         course = CourseHandler.get(course_name)
@@ -152,6 +158,24 @@ class CourseHandler(DbHandlerBase):
             log.info('Associate user "{}" with course "{}"'.format(username, course_name))
             session.add(cm)
             return cm
+
+    @staticmethod
+    @DBBridge.modife_db
+    def associate_with_invite_url(session, username, invite_url):
+        # TODO: verify if username CAN be a member of course_name
+        user = UserHandler.get(username)
+        course = CourseHandler.get_by_invite_url(invite_url)
+        if not CourseMembersHandler.get_member_by_course(course.id, user.id):
+            cm = CourseMembers(
+                course=course.id,
+                member=user.id,
+                assign_type=course.mode,
+            )
+            log.info('Associate user "{}" with course "{}"'.format(username, course.name))
+            session.add(cm)
+            return cm
+
+
 
     @staticmethod
     @DBBridge.modife_db

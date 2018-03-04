@@ -10,6 +10,9 @@ Name: {{ course.name}}<br>
 Description: {{ course.description }}<br>
 Mode: {{ course.mode }}<br>
 State: {{ course.state }}<br>
+{% if course.mode == course.PRIVATE %}
+<a href="/study/register/{{ course.invite_url }}">Invite url</a>
+{% end %}
 
 <br><br>
 

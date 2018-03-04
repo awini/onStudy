@@ -51,6 +51,7 @@ class Course(Base):
     owner = Column(Integer, ForeignKey('user.id'))
     mode = Column(Choice(COURSE_MODES))
     state = Column(Choice(COURSE_STATES))
+    invite_url = Column(String(length=36))
 
     _owner = relationship("User", back_populates="_course")
     _lesson = relationship("Lesson", back_populates="_course")

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register to Course {{ course.name}}</title>
+    <script type="text/javascript" src="/js/jquery/jquery.min.js"></script>
+</head>
+<body>
+<script>
+    if (confirm('Are you sure you want to join course "{{ course.name}}" ')) {
+        function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+        }
+
+        $.ajaxSetup({
+            headers: { "X-CSRFToken": getCookie("_xsrf") }
+        });
+        $.ajax({
+              url: "",
+              type: "post",
+              datatype: 'json',
+              success: function(data){
+                    window.location.replace('/study/manage');
+              },
+              error: function(data){
+                  alert('Error!');
+              },
+        });
+    } else {
+        window.location.replace('/');
+    }
+
+</script>
+
+</body>
+</html>

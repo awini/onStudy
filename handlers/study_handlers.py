@@ -1,3 +1,5 @@
+from tornado.web import authenticated
+
 from handlers.BaseHandler import BaseHandler
 from settings import sets
 
@@ -11,7 +13,7 @@ class BaseStudyHandler(BaseHandler):
 
 
 class StudyLiveHandler(BaseStudyHandler):
-
+    @authenticated
     def get(self):
         lessons = self.Course.get_open_course_live_lesson()
         return self.render('live.html', lessons=lessons)
@@ -21,10 +23,12 @@ class StudyLiveHandler(BaseStudyHandler):
 
 
 class StudyFindHandler(BaseStudyHandler):
+    @authenticated
     def get(self):
         open_courses, closed_courses = self.Course.get_all_course(self.get_current_user())
         return self.render('find.html', open_c=open_courses, closed_c=closed_courses)
 
+    @authenticated
     def post(self):
         # TODO: must be different behaviour for different: course_type = self.get_argument('courseType')
         course_name = self.get_argument('courseName')
@@ -35,19 +39,23 @@ class StudyFindHandler(BaseStudyHandler):
 
 
 class StudyManageHandler(BaseStudyHandler):
+    @authenticated
     def get(self):
         user_in = self.CourseMembers.get_all_study_course(self.get_current_user())
         return self.render('manage.html', user_in=user_in)
 
+    @authenticated
     def post(self):
         pass
 
 
 class StudyInviteHandler(BaseStudyHandler):
+    @authenticated
     def get(self):
         invites = self.CourseInvites.get_user_invites(self.get_current_user())
         return self.render('invite.html', invites=invites)
 
+    @authenticated
     def post(self):
         username = self.get_current_user()
         action = self.get_argument('action')
@@ -58,4 +66,24 @@ class StudyInviteHandler(BaseStudyHandler):
             self.CourseInvites.invite_on_decline(course_name, username)
         else:
             log.warning('Unknown action {}'.format(action))
+            self.set_status(400)
+
+
+class StudyRegisterHandler(BaseStudyHandler):
+    @authenticated
+    def get(self, invite_url):
+        course = self.Course.get_by_invite_url(invite_url)
+        if course:
+            self.render('register.html', course=course)
+        else:
+            self.set_status(400)
+
+    @authenticated
+    def post(self, invite_url):
+        course = self.Course.get_by_invite_url(invite_url)
+        if course:
+            assoc = self.Course.associate_with_invite_url(self.get_current_user(), invite_url)
+            if not assoc:
+                self.set_status(400)
+        else:
             self.set_status(400)
