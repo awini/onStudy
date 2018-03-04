@@ -32,10 +32,11 @@ class UserHandler(DbHandlerBase):
         return session.query(User).filter(User.email == email).one_or_none()
 
     @staticmethod
-    @DBBridge.add_to_db
-    def create(username, password, email):
+    @DBBridge.modife_db
+    def create(session, username, password, email):
         # TODO: check if username/email already exist
-        return User(name=username, password=password, email=email)
+        user = User(name=username, password=password, email=email)
+        session.add(user)
 
 
 class CourseHandler(DbHandlerBase):
@@ -119,10 +120,11 @@ class CourseHandler(DbHandlerBase):
         return courses
 
     @staticmethod
-    @DBBridge.add_to_db
-    def create(username, course_name, course_descr, mode):
+    @DBBridge.modife_db
+    def create(session, username, course_name, course_descr, mode):
         # TODO: check if course_name already exist
         user = UserHandler.get(username)
+
         c = Course(
             name=course_name,
             description=course_descr,
@@ -130,11 +132,12 @@ class CourseHandler(DbHandlerBase):
             mode=mode,
             state=Course.CREATED,
         )
+        session.add(c)
         return c
 
     @staticmethod
-    @DBBridge.add_to_db
-    def associate_with_course(username, course_name):
+    @DBBridge.modife_db
+    def associate_with_course(session, username, course_name):
         # TODO: verify if username already member of course_name
         # TODO: verify if username CAN be a member of course_name
         user = UserHandler.get(username)
@@ -146,11 +149,12 @@ class CourseHandler(DbHandlerBase):
                 assign_type=course.mode,
             )
             log.info('Associate user "{}" with course "{}"'.format(username, course_name))
+            session.add(cm)
             return cm
 
     @staticmethod
     @DBBridge.modife_db
-    def change_state(username, course_name, state):
+    def change_state(session, username, course_name, state):
         course = CourseHandler.get(course_name)
         course.state = state
 
@@ -166,7 +170,7 @@ class LessonHandler(DbHandlerBase):
 
     @staticmethod
     @DBBridge.modife_db
-    def activate_lesson(stream_key, stream_pw):
+    def activate_lesson(session, stream_key, stream_pw):
         lesson = LessonHandler.get_by_keys(stream_key, stream_pw)
         if lesson and lesson.state != lesson.ENDED:
             accept_start = lesson.start_time - timedelta(minutes=sets.STREAM_WINDOW)
@@ -184,7 +188,7 @@ class LessonHandler(DbHandlerBase):
 
     @staticmethod
     @DBBridge.modife_db
-    def stop_lesson(stream_key, stream_pw):
+    def stop_lesson(session, stream_key, stream_pw):
         lesson = LessonHandler.get_by_keys(stream_key, stream_pw)
         if lesson.state != Lesson.LIVE:
             # this can`t be possible on normal request
@@ -192,8 +196,8 @@ class LessonHandler(DbHandlerBase):
         lesson.state = Lesson.INTERRUPTED
 
     @staticmethod
-    @DBBridge.add_to_db
-    def create_lesson(username, course_name, l_name, l_descr, start_time, dur):
+    @DBBridge.modife_db
+    def create_lesson(session, username, course_name, l_name, l_descr, start_time, dur):
         # TODO: check if 'l_name' not already exist in lessons 'course_name'
         # TODO: check start_time (not cross with other lessons and in future)
         # TODO: check dur (must be non zero posivite value)
@@ -208,14 +212,16 @@ class LessonHandler(DbHandlerBase):
             stream_key=str(uuid4()),
             stream_pw=str(uuid4()).split('-')[-1]  # last string after '-' in ******-****-****-****-******
         )
+        session.add(l)
         return l
 
     @staticmethod
-    @DBBridge.rm_from_db
-    def delete_lesson(username, course_name, lesson_name):
+    @DBBridge.modife_db
+    def delete_lesson(session, username, course_name, lesson_name):
         course, lessons, _ = CourseHandler.get_by_owner(course_name, username)
         for l in lessons:
             if l.name == lesson_name:
+                session.delete(l)
                 return l
 
 
@@ -246,23 +252,24 @@ class CourseInvitesHandler(DbHandlerBase):
         return invites
 
     @staticmethod
-    @DBBridge.rm_from_db
-    def invite_on_decline(course_name, invited_user):
+    @DBBridge.modife_db
+    def invite_on_decline(session, course_name, invited_user):
         user_course = CourseInvitesHandler.get_user_invites(invited_user)
         for c in user_course:
             if c._course.name == course_name:
+                session.delete(c)
                 return c
         log.warning('No association for user "{}" and course "{}" in CourseInvites'.format(invited_user, course_name))
 
     @staticmethod
     @DBBridge.modife_db
-    def invite_on_accept(course_name, invited_user):
+    def invite_on_accept(session, course_name, invited_user):
         CourseInvitesHandler.invite_on_decline(course_name, invited_user)
         CourseHandler.associate_with_course(invited_user, course_name)
 
     @staticmethod
-    @DBBridge.add_to_db
-    def create_invite(course_name, owner, user_to_invite):
+    @DBBridge.modife_db
+    def create_invite(session, course_name, owner, user_to_invite):
         # TODO: check if user_to_invite already invited to this course
         course = CourseHandler.get(course_name)
         if course._owner.name != owner:
@@ -272,6 +279,7 @@ class CourseInvitesHandler(DbHandlerBase):
         if not user:
             log.debug('User with that name doesn`t exist!')
         i = CourseInvites(course=course.id, member=user.id)
+        session.add(i)
         return i
 
 

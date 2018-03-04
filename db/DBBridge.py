@@ -39,7 +39,7 @@ class DBBridge:
     def modife_db(func):
         def wrapper(*args, **kwargs):
             try:
-                result = func(*args, **kwargs)
+                result = func(DBBridge.__db_sessions, *args, **kwargs)
                 DBBridge.__db_sessions.commit()
                 return result
             except:
@@ -49,6 +49,7 @@ class DBBridge:
 
     @staticmethod
     def add_to_db(func):
+        # NOT USED NOW!! Use DBBridge.modife_db
         def wrapper(*args, **kwargs):
             try:
                 model = func(*args, **kwargs)
@@ -58,6 +59,7 @@ class DBBridge:
                 return model
             except IntegrityError:
                 log.exception('IntegrityError from func "{}" on model "{}"'.format(func, model))
+                raise
             except:
                 DB_SESSIONS.rollback()
                 raise
@@ -65,6 +67,7 @@ class DBBridge:
 
     @staticmethod
     def rm_from_db(func):
+        # NOT USED NOW!! Use DBBridge.modife_db
         def wrapper(*args, **kwargs):
             try:
                 model = func(*args, **kwargs)
