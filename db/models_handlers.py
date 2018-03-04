@@ -170,6 +170,14 @@ class LessonHandler(DbHandlerBase):
         ).one_or_none()
 
     @staticmethod
+    @DBBridge.query_db
+    def get_all_by_course(session, course_name):
+        lessons = []
+        for l in CourseHandler.get(course_name)._lesson:
+            lessons.append(l)
+        return lessons
+
+    @staticmethod
     @DBBridge.modife_db
     def activate_lesson(session, stream_key, stream_pw):
         lesson = LessonHandler.get_by_keys(stream_key, stream_pw)

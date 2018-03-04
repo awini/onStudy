@@ -38,8 +38,8 @@ $(document).ready(function(){
                     alert('Success!');
                     window.location.reload();
               },
-              error: function(){
-                  alert('Ошибка! Какая-нибудь...');
+              error: function(data){
+                  alert(data['responseText']);
               },
         });
     });

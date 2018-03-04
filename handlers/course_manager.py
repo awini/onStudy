@@ -69,7 +69,11 @@ class ManageCourseHandler(BaseCourseHandler):
             else:
                 log.debug('Success adding invite')
         else:
-            self.Course.change_state(user, course_name, action)
+            if self.Lesson.get_all_by_course(course_name):
+                self.Course.change_state(user, course_name, action)
+            else:
+                self.set_status(400)
+                self.write('Before "{}" Course you must create atleast one lection'.format(action))
 
 
 class CourseHandler(BaseCourseHandler):
