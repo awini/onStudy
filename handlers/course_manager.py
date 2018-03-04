@@ -1,6 +1,6 @@
 import tornado.web
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from handlers.BaseHandler import BaseHandler
 from db.models import Course
@@ -95,6 +95,7 @@ class LessonHandler(BaseHandler):
 
     @tornado.web.authenticated
     def post(self, *args, **kwargs):
+        # TODO: check owner
         action = self.get_argument('action')
         self.ACTIONS[action]()
 
@@ -102,17 +103,39 @@ class LessonHandler(BaseHandler):
         les_name = self.get_argument('lessonName')
         les_descr = self.get_argument('lessonDescription')
         start_time = self.__parse_datetime(self.get_argument('lessonStartTime'))
-        dur = self.get_argument('lessonDuration')
+        dur = int(self.get_argument('lessonDuration'))
         course_name = self.get_argument('courseName')
 
-        self.Lesson.create_lesson(
-            self.get_current_user(),
-            course_name,
-            les_name,
-            les_descr,
-            start_time,
-            dur,
-        )
+        err = self.__err_before_add(les_name, start_time, dur, course_name)
+        if err:
+            self.set_status(400)
+            self.write(err)
+        else:
+            self.Lesson.create_lesson(
+                self.get_current_user(),
+                course_name,
+                les_name,
+                les_descr,
+                start_time,
+                dur,
+            )
+
+    def __err_before_add(self, les_name, start_time, dur, course_name):
+        err_descr = None
+        if start_time < datetime.now():
+            err_descr = 'Lesson can`t start in past!'
+        if 300 < dur or dur < 10:
+            err_descr = 'Lessond duration must be in diaposon (10, 300)'
+        if self.Lesson.check_in_course(les_name, course_name):
+            err_descr = 'Lesson "{}" already exist in course "{}"'.format(les_name, course_name)
+        les_end = start_time + timedelta(minutes=dur)
+        for lesson in self.Lesson.get_all_by_course(course_name):
+            if lesson.start_time <= start_time <= lesson.start_time + timedelta(minutes=lesson.duration):
+                err_descr = 'New lesson start time cross {} lesson'.format(lesson.name)
+                continue
+            if lesson.start_time <= les_end <= lesson.start_time + timedelta(minutes=lesson.duration):
+                err_descr = 'New lesson end time cross {} lesson'.format(lesson.name)
+        return err_descr
 
     def __remove_lesson(self):
         course_name = self.get_argument('courseName')

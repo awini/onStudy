@@ -171,6 +171,13 @@ class LessonHandler(DbHandlerBase):
 
     @staticmethod
     @DBBridge.query_db
+    def check_in_course(session, lec_name, course_name):
+        return session.query(Lesson).join(Course).filter(
+            Lesson.name == lec_name, Course.name == course_name
+        ).one_or_none()
+
+    @staticmethod
+    @DBBridge.query_db
     def get_all_by_course(session, course_name):
         lessons = []
         for l in CourseHandler.get(course_name)._lesson:
@@ -207,9 +214,6 @@ class LessonHandler(DbHandlerBase):
     @staticmethod
     @DBBridge.modife_db
     def create_lesson(session, username, course_name, l_name, l_descr, start_time, dur):
-        # TODO: check if 'l_name' not already exist in lessons 'course_name'
-        # TODO: check start_time (not cross with other lessons and in future)
-        # TODO: check dur (must be non zero posivite value)
         course, _, _ = CourseHandler.get_by_owner(course_name, username)
         l = Lesson(
             name=l_name,
