@@ -259,6 +259,7 @@ class LessonHandler(DbHandlerBase):
         course, lessons, _ = CourseHandler.get_by_owner(course_name, username)
         for l in lessons:
             if l.name == lesson_name:
+                LessonMaterialHandler.delete_by_lesson(l)
                 session.delete(l)
                 return l
 
@@ -347,3 +348,12 @@ class LessonMaterialHandler(DbHandlerBase):
             lesson=lesson.id,
         )
         session.add(les_material)
+
+    @staticmethod
+    @DBBridge.modife_db
+    def delete_by_lesson(session, lesson):
+        files = session.query(LessonMaterial).filter(LessonMaterial.lesson == lesson.id)
+        for fl in files:
+            f_path = Path(sets.MEDIA_DIR) / fl.parent_dir / fl.real_name
+            f_path.unlink()
+            session.delete(fl)
