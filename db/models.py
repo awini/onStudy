@@ -86,6 +86,7 @@ class Lesson(Base):
     stream_pw  = Column(String(length=12))
 
     _course = relationship("Course", back_populates="_lesson")
+    _lesson_material = relationship("LessonMaterial", back_populates="_lesson")
 
 
 class CourseMembers(Base):
@@ -112,3 +113,15 @@ class CourseInvites(Base):
 
     _course = relationship("Course", back_populates="_course_invites")
     _member = relationship("User", back_populates="_course_invites")
+
+
+class LessonMaterial(Base):
+    __tablename__ = 'lesson_material'
+
+    id = Column(Integer, primary_key=True)
+    pretty_name = Column(String(length=255))
+    real_name = Column(String(length=255))
+    parent_dir = Column(String(length=10))
+    lesson = Column(Integer, ForeignKey('lesson.id'))
+
+    _lesson = relationship("Lesson", back_populates="_lesson_material")

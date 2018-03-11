@@ -1,10 +1,11 @@
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
+from pathlib import Path
 from uuid import uuid4
 
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import or_
 
-from db.models import CourseMembers, Course, User, Lesson, CourseInvites
+from db.models import CourseMembers, Course, User, Lesson, CourseInvites, LessonMaterial
 from db.DBBridge import DBBridge
 from settings import sets
 
@@ -320,3 +321,29 @@ class CourseInvitesHandler(DbHandlerBase):
         return i
 
 
+class LessonMaterialHandler(DbHandlerBase):
+    @staticmethod
+    @DBBridge.query_db
+    def get_with_path(session, file_name):
+        material = session.query(LessonMaterial).filter(LessonMaterial.real_name == file_name).one_or_none()
+        if material:
+            return Path(sets.MEDIA_DIR) / material.parent_dir / file_name, material
+
+
+    @staticmethod
+    @DBBridge.modife_db
+    def add_file(session, file_name, file_data, lesson):
+        file_dir = Path(sets.MEDIA_DIR) / str(date.today())
+        if not file_dir.is_dir():
+            file_dir.mkdir()
+
+        file_path = file_dir / str(uuid4())
+        file_path.write_bytes(file_data)
+
+        les_material = LessonMaterial(
+            pretty_name=file_name,
+            real_name=file_path.name,
+            parent_dir=file_path.parts[-2],
+            lesson=lesson.id,
+        )
+        session.add(les_material)

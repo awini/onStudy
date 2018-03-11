@@ -44,6 +44,9 @@ State: {{ course.state }}<br>
             {% end %}
           </tr>
         </table>
+        {% for material in l._lesson_material %}
+            <a href="/media/material/{{ material.real_name }}">{{ material.pretty_name}}</a> <br>
+        {% end %}
         <br><br><br>
         {% end %}
     {% else %}
@@ -88,13 +91,16 @@ State: {{ course.state }}<br>
       <h4 class="modal-title">Adding Lesson</h4>
     </div>
     <div class="modal-body">
-        <form action="" method="post" id="addLessonForm">
-        <label>Name: </label><input type="text" id="addLessonName" required /><br>
-        <label>Description:</label><br><textarea rows="4" cols="50" id="addLessonDescription" required> Enter description </textarea><br>
-        <label>Start time: </label><input type="datetime-local" id="addLessonStartTime" required /><br>
-        <label>Duration(minutes): </label><input type="number" min="0" id="addLessonDuration" required /><br>
-        <input type="hidden" id="addLessonCursename" value="{{ course.name }}">
-        <input type="submit" value="Add" class="btn btn-default"/>
+        <form action="/course/lesson" method="post" id="addLessonForm" enctype="multipart/form-data">
+            {% module xsrf_form_html() %}
+            <label>Name: </label><input type="text" name="lessonName" required /><br>
+            <label>Description:</label><br><textarea rows="4" cols="50" name="lessonDescription" required> Enter description </textarea><br>
+            <label>Start time: </label><input type="datetime-local" name="lessonStartTime" required /><br>
+            <label>Duration(minutes): </label><input type="number" min="0" name="lessonDuration" required /><br>
+            <label>Materials: </label><input type="file" name="lessonMaterials" multiple /><br>
+            <input type="hidden" id="addLessonCursename" name="lessonCursename" value="{{ course.name }}">
+            <input type="hidden" name="action" value="add">
+            <input type="submit" value="Add" class="btn btn-default"/>
         </form>
     </div>
 </div>

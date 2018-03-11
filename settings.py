@@ -25,6 +25,7 @@ class _Sets:
 
     DB_SCHEME = 'sqlite:///'
 
+    MEDIA_DIR = join(dirname(__file__), "media", "")
 
     STATIC_PATH = join(dirname(__file__), "static")
 

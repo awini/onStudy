@@ -35,6 +35,7 @@ from handlers.course_manager import CreateCourseHandler, ManageCourseHandler, Co
 from handlers.stream_handlers import StreamAuthHandler, StreamUpdateHandler, StreamTstHandler, StreamDoneHandler
 from handlers.study_handlers import (StudyFindHandler, StudyLiveHandler, StudyManageHandler,
                                      StudyInviteHandler, StudyRegisterHandler)
+from handlers.media_handlers import MaterialHandler
 
 
 class Application(tornado.web.Application):
@@ -65,6 +66,8 @@ class Application(tornado.web.Application):
             (r"/study/manage", StudyManageHandler),
             (r"/study/invite", StudyInviteHandler),
             (r"/study/register/(.*)", StudyRegisterHandler),
+
+            (r"/media/material/(.*)", MaterialHandler),
 
             (r"/(.*)/(.*)/(.*)", AssetsLibHandler),
             (r"/css/(.*)", CssHandler),

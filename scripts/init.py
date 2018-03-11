@@ -11,6 +11,7 @@ def init_all():
     init_start = datetime.now()
 
     check_log_dir()
+    check_media_dir()
 
     print('check requirements...')
     _text = install(sys.executable, "-m pip install -r requirements.txt")
@@ -83,3 +84,9 @@ def check_log_dir():
     log_dir = Path('logs')
     if not log_dir.is_dir():
         log_dir.mkdir()
+
+
+def check_media_dir():
+    media_dir = Path('media')
+    if not media_dir.is_dir():
+        media_dir.mkdir()

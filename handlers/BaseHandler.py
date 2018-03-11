@@ -1,7 +1,8 @@
 from tornado.web import RequestHandler
 from db.DBBridge import DBBridge
 from settings import sets
-from db.models_handlers import UserHandler, LessonHandler, CourseHandler, CourseMembersHandler, CourseInvitesHandler
+from db.models_handlers import (UserHandler, LessonHandler, CourseHandler,
+                                CourseMembersHandler, CourseInvitesHandler, LessonMaterialHandler)
 
 
 class BaseHandler(RequestHandler):
@@ -14,6 +15,7 @@ class BaseHandler(RequestHandler):
     Course = CourseHandler
     CourseMembers = CourseMembersHandler
     CourseInvites = CourseInvitesHandler
+    LessonMaterial = LessonMaterialHandler
 
     def get_current_user(self):
         '''

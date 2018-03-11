@@ -96,6 +96,7 @@ class LessonHandler(BaseHandler):
     @tornado.web.authenticated
     def post(self, *args, **kwargs):
         # TODO: check owner
+        # TODO: add option for remove material
         action = self.get_argument('action')
         self.ACTIONS[action]()
 
@@ -104,14 +105,19 @@ class LessonHandler(BaseHandler):
         les_descr = self.get_argument('lessonDescription')
         start_time = self.__parse_datetime(self.get_argument('lessonStartTime'))
         dur = int(self.get_argument('lessonDuration'))
-        course_name = self.get_argument('courseName')
+        course_name = self.get_argument('lessonCursename')
 
-        err = self.__err_before_add(les_name, start_time, dur, course_name)
+        try:
+            files = self.request.files['lessonMaterials']
+        except KeyError:
+            files = []
+
+        err = self.__err_before_add(les_name, start_time, dur, course_name, files)
         if err:
             self.set_status(400)
             self.write(err)
         else:
-            self.Lesson.create_lesson(
+            lesson = self.Lesson.create_lesson(
                 self.get_current_user(),
                 course_name,
                 les_name,
@@ -119,8 +125,13 @@ class LessonHandler(BaseHandler):
                 start_time,
                 dur,
             )
+            # TODO: FIX: if LessonMaterail fail to create, lesson was already created anyway!!!
+            for fl in files:
+                self.LessonMaterial.add_file(fl['filename'], fl['body'], lesson)
 
-    def __err_before_add(self, les_name, start_time, dur, course_name):
+        self.redirect('/course/manage?course={}'.format(course_name))
+
+    def __err_before_add(self, les_name, start_time, dur, course_name, files):
         err_descr = None
         if start_time < datetime.now():
             err_descr = 'Lesson can`t start in past!'
@@ -135,6 +146,9 @@ class LessonHandler(BaseHandler):
                 continue
             if lesson.start_time <= les_end <= lesson.start_time + timedelta(minutes=lesson.duration):
                 err_descr = 'New lesson end time cross {} lesson'.format(lesson.name)
+        for fl in files:
+            if len(fl['filename']) > 255:
+                err_descr = 'File "{}" name must be < 255'.format(fl['filename'])
         return err_descr
 
     def __remove_lesson(self):
