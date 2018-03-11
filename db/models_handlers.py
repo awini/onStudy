@@ -5,7 +5,7 @@ from uuid import uuid4
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import or_
 
-from db.models import CourseMembers, Course, User, Lesson, CourseInvites, LessonMaterial
+from db.models import CourseMembers, Course, User, Lesson, CourseInvites, LessonMaterial, HomeWork
 from db.DBBridge import DBBridge
 from settings import sets
 
@@ -357,3 +357,16 @@ class LessonMaterialHandler(DbHandlerBase):
             f_path = Path(sets.MEDIA_DIR) / fl.parent_dir / fl.real_name
             f_path.unlink()
             session.delete(fl)
+
+
+class HomeWorkHandler(DbHandlerBase):
+
+    @staticmethod
+    @DBBridge.modife_db
+    def add(session, hw_desct, lesson):
+        hw = HomeWork(
+            description=hw_desct,
+            lesson=lesson.id,
+        )
+        session.add(hw)
+        return hw

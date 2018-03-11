@@ -19,6 +19,7 @@ class User(Base):
     _course = relationship('Course', back_populates='_owner')
     _course_member = relationship("CourseMembers", back_populates="_member")
     _course_invites = relationship("CourseInvites", back_populates="_member")
+    _home_work_answer = relationship("HomeWorkAnswer", back_populates="_source")
 
 
 class Course(Base):
@@ -87,6 +88,7 @@ class Lesson(Base):
 
     _course = relationship("Course", back_populates="_lesson")
     _lesson_material = relationship("LessonMaterial", back_populates="_lesson")
+    _home_work = relationship("HomeWork", back_populates="_lesson")
 
 
 class CourseMembers(Base):
@@ -125,3 +127,27 @@ class LessonMaterial(Base):
     lesson = Column(Integer, ForeignKey('lesson.id'))
 
     _lesson = relationship("Lesson", back_populates="_lesson_material")
+
+
+class HomeWork(Base):
+    __tablename__ = 'home_work'
+
+    id = Column(Integer, primary_key=True)
+    description = Column(Text)
+    lesson = Column(Integer, ForeignKey('lesson.id'))
+
+    _lesson = relationship("Lesson", back_populates="_home_work")
+    _home_work_answer = relationship("HomeWorkAnswer", back_populates="_home_work")
+
+
+class HomeWorkAnswer(Base):
+    __tablename__ = 'home_work_answer'
+
+    id = Column(Integer, primary_key=True)
+    description = Column(Text)
+    home_work = Column(Integer, ForeignKey('home_work.id'))
+    source = Column(Integer, ForeignKey('user.id'))
+    grade = Column(Integer)  # in %
+
+    _home_work = relationship("HomeWork", back_populates="_home_work_answer")
+    _source = relationship("User", back_populates="_home_work_answer")

@@ -125,6 +125,11 @@ class LessonHandler(BaseHandler):
                 start_time,
                 dur,
             )
+            if lesson._course.mode != Course.OPEN:
+                if self.get_argument('isHomeWork', default=None) == 'on':
+                    hw_text = self.get_argument('homeWorkDescr')
+                    if hw_text:
+                        self.HomeWork.add(hw_text, lesson)
             # TODO: FIX: if LessonMaterail fail to create, lesson was already created anyway!!!
             for fl in files:
                 self.LessonMaterial.add_file(fl['filename'], fl['body'], lesson)

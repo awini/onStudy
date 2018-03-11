@@ -4,7 +4,7 @@ from os.path import join, dirname
 
 class _Sets:
 
-    _DEBUG = False
+    _DEBUG = True
     TESTING = False
 
     BOWER_COMPONENTS = 'bower_components'
