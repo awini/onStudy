@@ -7,3 +7,4 @@ bower.json
 *.db
 env
 .ma
+media/
