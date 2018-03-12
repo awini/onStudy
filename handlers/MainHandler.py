@@ -1,5 +1,5 @@
 from handlers.BaseHandler import BaseHandler
-import tornado.web
+import tornado.web, tornado.websocket
 from tornado import gen, web, httpclient
 
 from logging import getLogger
@@ -16,6 +16,41 @@ class MainHandler(BaseHandler):
         ]
 
         return self.render("main.html", open_lecs=open_lecs)
+
+class WsUpdateMainHandler(tornado.websocket.WebSocketHandler):
+    all_waiters = set()
+
+    def get_compression_options(self):
+        # Non-None enables compression with default options.
+        return {}
+
+    def open(self):
+        self.all_waiters.add(self)
+
+    def on_close(self):
+        self.all_waiters.remove(self)
+
+    def send_update(self, message):
+        encoded_message = tornado.escape.json_encode(message)
+        self.write_encoded_to_waiter(self, encoded_message)
+
+    def on_message(self, message):
+        message = message.replace('\n',r'\n') # FIXME
+        message = tornado.escape.json_decode(message)
+        self.send_update_to_waiters(self.all_waiters, message)
+
+    @classmethod
+    def send_update_to_waiters(cls, waiters, message):
+        encoded_message = tornado.escape.json_encode(message)
+        for waiter in waiters:
+            cls.write_encoded_to_waiter(waiter, encoded_message)
+
+    @classmethod
+    def write_encoded_to_waiter(cls, waiter, encoded_message):
+        try:
+            waiter.write_message(encoded_message)
+        except:
+            pass
 
 
 class AboutHandler(BaseHandler):

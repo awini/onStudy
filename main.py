@@ -28,7 +28,7 @@ log = logging.getLogger('main')
 import tornado.ioloop
 import tornado.web
 
-from handlers.MainHandler import MainHandler, RoomHandler, AboutHandler
+from handlers.MainHandler import MainHandler, WsUpdateMainHandler, RoomHandler, AboutHandler
 from handlers.auth import LogoutHandler, LoginHandler, RegisterHandler
 from handlers.static_handlers import CssHandler, AssetsLibHandler
 from handlers.course_manager import CreateCourseHandler, ManageCourseHandler, CourseHandler, LessonHandler
@@ -44,6 +44,8 @@ class Application(tornado.web.Application):
 
         handlers = [
             (r"/", MainHandler),
+            (r"/ws/update/main/", WsUpdateMainHandler),
+
             (r"/about", AboutHandler),
             (r"/room", RoomHandler),
 
