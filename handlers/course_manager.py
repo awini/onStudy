@@ -116,6 +116,7 @@ class LessonHandler(BaseHandler):
         if err:
             self.set_status(400)
             self.write(err)
+            return
         else:
             lesson = self.Lesson.create_lesson(
                 self.get_current_user(),
