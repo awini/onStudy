@@ -9,11 +9,11 @@ if __name__ == "__main__":
         if a in sys.argv:
             print('''python main.py [init]\n\nCommands:
     init     - for init project on start or reinit on changed requirements.
-    debug    - for debug in terminal.''')
+    nodebug    - for debug in terminal.''')
             sys.exit(0)
 
-    if 'debug' in sys.argv:
-        sets.DEBUG = True
+    if 'nodebug' in sys.argv:
+        sets.DEBUG = False
 
     if 'init' in sys.argv:
         from scripts.init import init_all
