@@ -9,13 +9,15 @@ log = getLogger(__name__)
 class MainHandler(BaseHandler):
 
     def get(self):
-        # TODO: put here info from db
-        open_lecs = [
-            {'title':'frontend anywere', 'course':'frontend', 'lector':'Kirill', 'time':'today 16:00', 'long':'01:00'},
-            {'title':'powerful alghoritms', 'course':'c++', 'lector':'Alex', 'time':'tomorrow 20:00', 'long':'01:00'}
-        ]
+        # TODO: Example of courses
+        # open_lecs = [
+        #     {'title':'frontend anywere', 'course':'frontend', 'lector':'Kirill', 'time':'today 16:00', 'long':'01:00'},
+        #     {'title':'powerful alghoritms', 'course':'c++', 'lector':'Alex', 'time':'tomorrow 20:00', 'long':'01:00'}
+        # ]
 
-        return self.render("main.html", open_lecs=open_lecs)
+        lessons = self.Course.get_open_course_live_lesson()
+
+        return self.render("main.html", lessons=lessons)
 
 class WsUpdateMainHandler(tornado.websocket.WebSocketHandler):
     all_waiters = set()

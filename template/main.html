@@ -14,12 +14,12 @@
     </div>
 
     <div class="container">
-      {% if len(open_lecs) > 0 %}
+      {% if len(lessons) > 0 %}
       <div class="row">
-      {% for lec in open_lecs %}
+      {% for less in lessons %}
         <div class="col-md-4">
-          <h3>{{ lec['title'] }}</h3>
-          <p class="lead">{{ lec['course'] }}<a class='float-right'>{{ lec['time'] }} / {{ lec['lector'] }}</a></p>
+          <p><span class="h3">{{ less.name }}</span> <span class="lead float-right">{{ less.start_time_in_format() }}</span></p>
+          <p class="lead">{{ less._course.name }} <a class='float-right'> / {{ less._course._owner.name }}</a></p>
         </div>
       {% end %}
       </div>

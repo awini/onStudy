@@ -8,3 +8,4 @@ bower.json
 env
 .ma
 media/
+.vscode/

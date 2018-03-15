@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, ForeignKey, Text, DateTime, UniqueConstraint
 from sqlalchemy.orm import relationship
@@ -89,6 +91,9 @@ class Lesson(Base):
     _course = relationship("Course", back_populates="_lesson")
     _lesson_material = relationship("LessonMaterial", back_populates="_lesson")
     _home_work = relationship("HomeWork", back_populates="_lesson")
+
+    def start_time_in_format(self, format='%H:%M'):
+        return self.start_time.strftime(format)
 
 
 class CourseMembers(Base):
