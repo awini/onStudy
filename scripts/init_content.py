@@ -15,48 +15,47 @@ from settings import sets
 NOW = datetime.now()
 
 INIT_DATA = {
-    'streamer1':
-        {
-            'All About Python': {
-                'description': 'In this course you lear all about Python',
-                'mode': Course.OPEN,
-                'state': Course.LIVE,
-                'lessons': {
-                    'Part 1': {
-                        'description': 'Some basic concept...',
-                        'position': 0,  # 0 = today (NOW), -1 = yesterday, 1 = tomorow
-                        'materials': {
-                            'presentation1.txt': 'Just some text in presentation1.txt',
-                            'blablabla': 'Just some text in presentation2.txt',
-                        }
-                    },
-                    'Part 2': {
-                        'description': 'Some aditional concept...',
-                        'position': 1,
-                    },
-                },
-            },
-            'All About GoLang': {
-                'description': 'In this course you lear all about GoLang',
-                'mode': Course.OPEN,
-                'state': Course.LIVE,
-                'lessons': {
-                    'Intro in GO': {
-                        'description': 'Why, Where, Who, How',
-                        'position': -1,
-                    },
-                    'Try Go': {
-                        'description': 'standart operatorors and library',
-                        'position': 0,
-                    },
-                    'Deep in Go': {
-                        'description': 'In this course you will know about interface, multithreading, methods...',
-                        'position': 1,
+    'Peter Parker': {
+        'All About Python': {
+            'description': 'In this course you learn all about Python',
+            'mode': Course.OPEN,
+            'state': Course.LIVE,
+            'lessons': {
+                'Part 1': {
+                    'description': 'Some basic concept...',
+                    'position': 0,  # 0 = today (NOW), -1 = yesterday, 1 = tomorow, 2 = add 2 days
+                    'materials': {
+                        'presentation1.txt': 'Just some text in presentation1.txt',
+                        'blablabla': 'Just some text in presentation2.txt',
                     }
+                },
+                'Part 2': {
+                    'description': 'Some aditional concept...',
+                    'position': 1,
                 },
             },
         },
-    'streamer2': {
+        'All About Golang': {
+            'description': 'In this course you learn all about Golang',
+            'mode': Course.OPEN,
+            'state': Course.LIVE,
+            'lessons': {
+                'Intro in GO': {
+                    'description': 'Why, Where, Who, How',
+                    'position': -1,
+                },
+                'Try Go': {
+                    'description': 'standart operatorors and library',
+                    'position': 0,
+                },
+                'Deep in Go': {
+                    'description': 'In this course you will know about interface, multithreading, methods...',
+                    'position': 1,
+                }
+            },
+        },
+    },
+    'Tony Stark': {
         'Tornado OR Django?': {
                 'description': 'Comparison two framework, their cons and pros',
                 'mode': Course.CLOSED,
@@ -75,6 +74,46 @@ INIT_DATA = {
                         'position': 2
                     },
                 },
+        },
+    },
+    'Bruce Wayne': {
+        'Databases: SQL and NoSQL': {
+            'description': 'In this course you learn all about databases',
+            'mode': Course.OPEN,
+            'state': Course.LIVE,
+            'lessons': {
+                'Part 1': {
+                    'description': 'Some basic concept...',
+                    'position': 1,  # 0 = today (NOW), -1 = yesterday, 1 = tomorow
+                    'materials': {
+                        'presentation1.txt': 'Just some text in presentation1.txt',
+                        'blablabla': 'Just some text in presentation2.txt',
+                    }
+                },
+                'Part 2': {
+                    'description': 'Some aditional concept...',
+                    'position': 2,
+                },
+            },
+        },
+        'Frontend': {
+            'description': 'In this course you learn how to make frontend',
+            'mode': Course.OPEN,
+            'state': Course.LIVE,
+            'lessons': {
+                'Intro in GO': {
+                    'description': 'Why, Where, Who, How',
+                    'position': -1,
+                },
+                'Try Go': {
+                    'description': 'standart operatorors and library',
+                    'position': 0,
+                },
+                'Deep in Go': {
+                    'description': 'In this course you will know about interface, multithreading, methods...',
+                    'position': 1,
+                }
+            },
         },
     },
 }

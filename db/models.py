@@ -93,7 +93,20 @@ class Lesson(Base):
     _home_work = relationship("HomeWork", back_populates="_lesson")
 
     def start_time_in_format(self, format='%H:%M'):
-        return self.start_time.strftime(format)
+        now = datetime.now()
+        dt = self.start_time
+        dt_s = dt.strftime(format)
+        filled = False
+        if now.year == dt.year and now.month == dt.month:
+            if dt.day == now.day:
+                dt_s = "today " + dt_s
+                filled = True
+            elif dt.day == now.day + 1:
+                dt_s = "tomorrow " + dt_s
+                filled = True
+        if not filled:
+            dt_s += "(" + dt.strftime("%Y/%m/%d")
+        return dt_s
 
 
 class CourseMembers(Base):

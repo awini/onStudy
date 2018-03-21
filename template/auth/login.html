@@ -23,7 +23,9 @@
 
     </div>
 
-    <form class="row justify-content-center">
+    <form class="row justify-content-center" method="post" action="login">
+
+        {% module xsrf_form_html() %}
 
             <div class="col col-md-6 align-self-center">
             {% if msg %}<div class="form-group"><p class="text-center">{{ msg }}</p></div>{% end %}

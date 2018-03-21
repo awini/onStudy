@@ -126,6 +126,12 @@ class CourseHandler(DbHandlerBase):
         return courses
 
     @staticmethod
+    @DBBridge.query_db
+    def get_course_by_id(session, course_id):
+        course = session.query(Course).filter(Course.id == course_id).one_or_none()
+        return course
+
+    @staticmethod
     @DBBridge.modife_db
     def create(session, username, course_name, course_descr, mode):
         user = UserHandler.get(username)

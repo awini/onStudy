@@ -9,42 +9,59 @@
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">
       <div class="container">
-        <h1>Welcome to on:Study!</h1>
+          <div class="row">
+              <h1>Welcome to on:Study!</h1>
+          </div>
       </div>
     </div>
 
+    <div class="open-lessons-jumbotron">
     <div class="container">
-      {% if len(lessons) > 0 %}
-      <div class="row">
-      {% for less in lessons %}
-        <div class="col-md-4">
-          <p><span class="h3">{{ less.name }}</span> <span class="lead float-right">{{ less.start_time_in_format() }}</span></p>
-          <p class="lead">{{ less._course.name }} <a class='float-right'> / {{ less._course._owner.name }}</a></p>
+        <div class="row mb-3">
+            <h2>Open lessons</h2>
         </div>
-      {% end %}
-      </div>
-      {% end %}
+        {% if len(lessons) > 0 %}
+        <div class="row">
+            {% for less in lessons %}
+            <div class="col-md-4">
+                <p><span class="h4">{{ less.name }}</span> <span class="lead float-right">{{ less.start_time_in_format() }}</span></p>
+              <p class="lead"><a href="/course/{{ less._course.id }}">{{ less._course.name }}</a> <a class='float-right'> / {{ less._course._owner.name }}</a></p>
+            </div>
+            {% end %}
+        </div>
+        {% else %}
+        No open lessons yet.
+        {% end %}
+    </div>
+    </div>
+
+    <hr>
+
+    <div class="container">
       <!-- Example row of columns -->
       <div class="row">
         <div class="col-md-4">
           <h2>Learn</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+          <p>Choose courses that you like, watch lectures, solve tasks. We will tell you a lot of useful. This no one else will tell.</p>
           <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
         </div>
         <div class="col-md-4">
           <h2>Teach</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+          <p>Pass our tests on the teacher and get into our team. It's the possibilities of self-realization, and the work that you like. You can do it at a convenient time and in a convenient place.</p>
           <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
        </div>
         <div class="col-md-4">
           <h2>Easy</h2>
-          <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+          <p>Our system is created for you. All for learning. All for study. Here there are tools for online lectures, for self-study of material and passing tests.</p>
           <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
         </div>
       </div>
+    </div>
+    </div>
 
-      <hr>
+    <hr>
 
+    <div class="container">
       <footer>
         <p>&copy; onStudy 2018</p>
       </footer>

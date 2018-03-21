@@ -1,0 +1,38 @@
+{% extends "../base.html" %}
+
+{% block title %}Home{% end %}
+
+{% block content %}
+
+<div class="open-lessons-jumbotron mt-3">
+    <div class="container">
+        <div class="row">
+            <h2>{{ course.name }}</h2>
+            <p class="lead mt-3 ml-3"><a class='float-right'> / {{ course._owner.name }}</a></p>
+        </div>
+        <div class="row">
+            <p class="lead">{{ course.description }} </p>
+        </div>
+        <div class="row">
+            <p class="lead">{{ course.mode }}</p>
+            <p class="lead ml-3">{{ course.state }}</p>
+        </div>
+    </div>
+    <hr>
+    <div class="container">
+        {% if len(course._lesson) > 0 %}
+        <div class="row">
+            {% for less in course._lesson %}
+            <div class="col-md-4">
+              <p><span class="h4">{{ less.name }}</span> <span class="lead float-right">{{ less.start_time_in_format() }}</span></p>
+              <p class="lead">{{ less._course.name }} <a class='float-right'> / {{ less._course._owner.name }}</a></p>
+            </div>
+            {% end %}
+        </div>
+        {% else %}
+        No open lessons yet.
+        {% end %}
+    </div>
+</div>
+
+{% end %}

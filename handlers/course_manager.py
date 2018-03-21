@@ -76,11 +76,30 @@ class ManageCourseHandler(BaseCourseHandler):
                 self.write('Before "{}" Course you must create atleast one lection'.format(action))
 
 
-class CourseHandler(BaseCourseHandler):
+class CoursesHandler(BaseCourseHandler):
+
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
         user_courses = self.Course.get_all_by_owner(self.get_current_user())
         return self.render('courses.html', courses=user_courses)
+
+class CourseHandler(BaseCourseHandler):
+
+    def get(self, course_id, *args, **kwargs):
+        course = self.Course.get_course_by_id(course_id)
+        if course.mode == Course.OPEN:
+            return self.get_open_course(course)
+        return self.get_not_open_course(course)
+
+    def get_open_course(self, course):
+        self.render_course(course)
+
+    @tornado.web.authenticated
+    def get_not_open_course(self, course):
+        self.render_course(course)
+
+    def render_course(self, course):
+        return self.render('course.html', course=course)
 
 
 class LessonHandler(BaseHandler):
