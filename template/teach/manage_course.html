@@ -11,7 +11,12 @@ Description: {{ course.description }}<br>
 Mode: {{ course.mode }}<br>
 State: {{ course.state }}<br>
 {% if course.mode == course.PRIVATE %}
-<a href="/study/register/{{ course.invite_url }}">Invite url</a>
+<br>Invite url:<a id="inviteUrl" href="/study/register/{{ course.invite_url }}"></a>
+<script type="text/javascript">
+window.onload = function(){
+    document.getElementById("inviteUrl").innerHTML = " " + document.URL + "{{ course.invite_url }}";
+}
+</script>
 {% end %}
 
 <br><br>
@@ -94,7 +99,7 @@ State: {{ course.state }}<br>
       <h4 class="modal-title">Adding Lesson</h4>
     </div>
     <div class="modal-body">
-        <form action="/course/lesson" method="post" id="addLessonForm" enctype="multipart/form-data">
+        <form action="/teach/lesson" method="post" id="addLessonForm" enctype="multipart/form-data">
             {% module xsrf_form_html() %}
             <label>Name: </label><input type="text" name="lessonName" required /><br>
             <label>Description:</label><br><textarea rows="4" cols="50" name="lessonDescription" required> Enter description </textarea><br>

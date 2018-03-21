@@ -31,9 +31,9 @@ import tornado.web
 from handlers.MainHandler import MainHandler, WsUpdateMainHandler, RoomHandler, AboutHandler
 from handlers.auth import LogoutHandler, LoginHandler, RegisterHandler
 from handlers.static_handlers import CssHandler, AssetsLibHandler
-from handlers.course_manager import CreateCourseHandler, ManageCourseHandler, CoursesHandler, CourseHandler, LessonHandler
+from handlers.course_manager import CreateCourseHandler, ManageCourseHandler, CoursesHandler, LessonHandler
 from handlers.stream_handlers import StreamAuthHandler, StreamUpdateHandler, StreamTstHandler, StreamDoneHandler
-from handlers.study_handlers import (StudyFindHandler, StudyLiveHandler, StudyManageHandler,
+from handlers.study_handlers import (StudyFindHandler, StudyLiveHandler, StudyManageHandler, StudyCourseHandler,
                                      StudyInviteHandler, StudyRegisterHandler)
 from handlers.media_handlers import MaterialHandler
 
@@ -58,17 +58,17 @@ class Application(tornado.web.Application):
             (r"/auth/logout", LogoutHandler),
             (r"/auth/register", RegisterHandler),
 
-            (r"/courses", CoursesHandler),
-            (r"/course/(.*)", CourseHandler),
-            (r"/course/create", CreateCourseHandler),
-            (r"/course/manage", ManageCourseHandler),
-            (r"/course/lesson", LessonHandler),
+            (r"/teach", CoursesHandler),
+            (r"/teach/create", CreateCourseHandler),
+            (r"/teach/manage", ManageCourseHandler),
+            (r"/teach/lesson", LessonHandler),
 
             (r"/study/live", StudyLiveHandler),
             (r"/study/find", StudyFindHandler),
             (r"/study/manage", StudyManageHandler),
             (r"/study/invite", StudyInviteHandler),
             (r"/study/register/(.*)", StudyRegisterHandler),
+            (r"/study/course/(.*)", StudyCourseHandler),
 
             (r"/media/material/(.*)", MaterialHandler),
 

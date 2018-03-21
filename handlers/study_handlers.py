@@ -1,5 +1,6 @@
 from tornado.web import authenticated
 
+from db.models import Course
 from handlers.BaseHandler import BaseHandler
 from settings import sets
 
@@ -87,3 +88,22 @@ class StudyRegisterHandler(BaseStudyHandler):
                 self.set_status(400)
         else:
             self.set_status(400)
+
+
+class StudyCourseHandler(BaseStudyHandler):
+
+    def get(self, course_id, *args, **kwargs):
+        course = self.Course.get_course_by_id(course_id)
+        if course.mode == Course.OPEN:
+            return self.get_open_course(course)
+        return self.get_not_open_course(course)
+
+    def get_open_course(self, course):
+        self.render_course(course)
+
+    @authenticated
+    def get_not_open_course(self, course):
+        self.render_course(course)
+
+    def render_course(self, course):
+        return self.render('course.html', course=course)

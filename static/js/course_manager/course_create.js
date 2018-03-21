@@ -45,7 +45,7 @@ $(document).ready(function(){
               datatype: 'json',
               success: function(data){
                     alert('Курс создан!');
-                    window.location.href = '/course/manage?course=' + sendData['courseName'];
+                    window.location.href = '/teach/manage?course=' + sendData['courseName'];
               },
               error: function(data){
                   alert(data['responseText']);

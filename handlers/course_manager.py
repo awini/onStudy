@@ -12,7 +12,7 @@ log = getLogger(__name__)
 
 class BaseCourseHandler(BaseHandler):
     def get_template_path(self):
-        return sets.TEMPLATE_PATH + 'courses'
+        return sets.TEMPLATE_PATH + 'teach'
 
 
 class CreateCourseHandler(BaseCourseHandler):
@@ -83,24 +83,6 @@ class CoursesHandler(BaseCourseHandler):
         user_courses = self.Course.get_all_by_owner(self.get_current_user())
         return self.render('courses.html', courses=user_courses)
 
-class CourseHandler(BaseCourseHandler):
-
-    def get(self, course_id, *args, **kwargs):
-        course = self.Course.get_course_by_id(course_id)
-        if course.mode == Course.OPEN:
-            return self.get_open_course(course)
-        return self.get_not_open_course(course)
-
-    def get_open_course(self, course):
-        self.render_course(course)
-
-    @tornado.web.authenticated
-    def get_not_open_course(self, course):
-        self.render_course(course)
-
-    def render_course(self, course):
-        return self.render('course.html', course=course)
-
 
 class LessonHandler(BaseHandler):
 
@@ -154,7 +136,7 @@ class LessonHandler(BaseHandler):
             for fl in files:
                 self.LessonMaterial.add_file(fl['filename'], fl['body'], lesson)
 
-        self.redirect('/course/manage?course={}'.format(course_name))
+        self.redirect('/teach/manage?course={}'.format(course_name))
 
     def __err_before_add(self, les_name, start_time, dur, course_name, files):
         err_descr = None

@@ -25,7 +25,7 @@
             {% for less in lessons %}
             <div class="col-md-4">
                 <p><span class="h4">{{ less.name }}</span> <span class="lead float-right">{{ less.start_time_in_format() }}</span></p>
-              <p class="lead"><a href="/course/{{ less._course.id }}">{{ less._course.name }}</a> <a class='float-right'> / {{ less._course._owner.name }}</a></p>
+              <p class="lead"><a href="/study/course/{{ less._course.id }}">{{ less._course.name }}</a> <a class='float-right'> / {{ less._course._owner.name }}</a></p>
             </div>
             {% end %}
         </div>
