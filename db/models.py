@@ -105,7 +105,7 @@ class Lesson(Base):
                 dt_s = "tomorrow " + dt_s
                 filled = True
         if not filled:
-            dt_s += "(" + dt.strftime("%Y/%m/%d")
+            dt_s += " (" + dt.strftime("%Y-%m-%d") + ")"
         return dt_s
 
 

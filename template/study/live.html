@@ -1,34 +1,50 @@
 {% extends "../base.html" %}
 
-{% block title %}Home{% end %}
+{% block title %}Live lessons{% end %}
 
 {% block content %}
 
-<br><br><br><br>
+<div class="jumbotron">
+  <div class="container">
+      <div class="row">
+          <h1>Now we have live lessons:</h1>
+      </div>
+  </div>
+</div>
 
-<table style="width:50%">
-  <tr>
-    <th>Course Name</th>
-    <th>Autor</th>
-    <th>Name</th>
-    <th>Description</th>
-    <th>Start Time</th>
-    <th>Duration</th>
-    <th>State</th>
-    <th>Watch now!</th>
-  </tr>
-    {% for l in lessons %}
-  <tr>
-    <td>{{ l._course.name }}</td>
-    <td>{{ l._course._owner.name}}</td>
-    <td>{{ l.name }}</td>
-    <td>{{ l.description }}</td>
-    <td>{{ l.start_time }}</td>
-    <td>{{ l.duration }}</td>
-    <td>{{ l.state }}</td>
-    <td> <a href="/stream?stream_key={{ l.stream_key }}">Watch Now!</a></td>
-  </tr>
-    {% end %}
-</table>
+<div class="container">
+    <!-- Example row of columns -->
+    <div class="row">
+      <div class="list-group col-md-8">
+
+        {% for l in lessons %}
+        
+          <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">{{ l.name }} </h5>
+              <small> {{ l.duration }} minutes / start at {{ l.start_time_in_format() }} / {{ l.state }}</small>
+            </div>
+
+            <div class="d-flex w-100 justify-content-between align-items-center">
+              <span class="mb-1 ">{{ l.description }}</span>
+              <small>{{ l._course.name }}</small>
+            </div>
+
+            <div class="d-flex w-100 justify-content-between align-items-end">
+                <small>{{ l._course._owner.name }}</small>
+                <button class="btn">Watch Now!</button>
+            </div>
+            
+            <!--p> <a href="/stream?stream_key={{ l.stream_key }}">Watch Now!</a></p-->
+          </a>
+
+        {% end %}
+      </div>
+      <div class="col-md-4">
+        FIXME: Here may be some info...
+      </div>
+
+    </div>
+</div>
 
 {% end %}

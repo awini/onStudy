@@ -14,7 +14,7 @@ class BaseStudyHandler(BaseHandler):
 
 
 class StudyLiveHandler(BaseStudyHandler):
-    #@authenticated
+    
     def get(self):
         lessons = self.Course.get_open_course_live_lesson()
         return self.render('live.html', lessons=lessons)
