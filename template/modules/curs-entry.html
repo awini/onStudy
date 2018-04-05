@@ -1,0 +1,17 @@
+<a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+    
+    <div class="d-flex w-100 justify-content-between">
+        <h5 class="mb-1">{{ curs.name }} </h5>
+        <small>{{ curs.state }}</small>
+    </div>
+
+    <div class="d-flex w-100 justify-content-between align-items-center">
+        <span class="mb-1 ">{{ curs.description }}</span>
+    </div>
+
+    <div class="d-flex w-100 justify-content-between align-items-end">
+        <small>{{ curs._owner.name }}</small>
+        <button type="button" class="btn addStudyOpenBtn" value="{{ curs.name }}">{{ button_title }}</button>
+    </div>
+
+</a>

@@ -17,28 +17,10 @@
     <div class="row">
       <div class="list-group col-md-8">
 
-        {% for l in lessons %}
-        
-          <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-            <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">{{ l.name }} </h5>
-              <small> {{ l.duration }} minutes / start at {{ l.start_time_in_format() }} / {{ l.state }}</small>
-            </div>
-
-            <div class="d-flex w-100 justify-content-between align-items-center">
-              <span class="mb-1 ">{{ l.description }}</span>
-              <small>{{ l._course.name }}</small>
-            </div>
-
-            <div class="d-flex w-100 justify-content-between align-items-end">
-                <small>{{ l._course._owner.name }}</small>
-                <button class="btn">Watch Now!</button>
-            </div>
-            
-            <!--p> <a href="/stream?stream_key={{ l.stream_key }}">Watch Now!</a></p-->
-          </a>
-
+        {% for lesson in lessons %}
+          {% module LessonEntry(lesson) %}
         {% end %}
+
       </div>
       <div class="col-md-4">
         FIXME: Here may be some info...
