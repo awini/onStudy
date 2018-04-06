@@ -1,34 +1,32 @@
 {% extends "../base.html" %}
 
-{% block title %}Home{% end %}
+{% block title %}Live lessons{% end %}
 
 {% block content %}
 
-<br><br><br><br>
+<div class="jumbotron">
+  <div class="container">
+      <div class="row">
+          <h1>Now we have live lessons:</h1>
+      </div>
+  </div>
+</div>
 
-<table style="width:50%">
-  <tr>
-    <th>Course Name</th>
-    <th>Autor</th>
-    <th>Name</th>
-    <th>Description</th>
-    <th>Start Time</th>
-    <th>Duration</th>
-    <th>State</th>
-    <th>Watch now!</th>
-  </tr>
-    {% for l in lessons %}
-  <tr>
-    <td>{{ l._course.name }}</td>
-    <td>{{ l._course._owner.name}}</td>
-    <td>{{ l.name }}</td>
-    <td>{{ l.description }}</td>
-    <td>{{ l.start_time }}</td>
-    <td>{{ l.duration }}</td>
-    <td>{{ l.state }}</td>
-    <td> <a href="/stream?stream_key={{ l.stream_key }}">Watch Now!</a></td>
-  </tr>
-    {% end %}
-</table>
+<div class="container">
+    <!-- Example row of columns -->
+    <div class="row">
+      <div class="list-group col-md-8">
+
+        {% for lesson in lessons %}
+          {% module LessonEntry(lesson) %}
+        {% end %}
+
+      </div>
+      <div class="col-md-4">
+        FIXME: Here may be some info...
+      </div>
+
+    </div>
+</div>
 
 {% end %}

@@ -4,6 +4,45 @@
 
 {% block content %}
 
+<div class="jumbotron">
+    <div class="container">
+        <div class="row">
+            <h1>See courses that we have:</h1>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+      <div class="col-md-6 my-3">
+          <h3>Opened courses</h3>
+      </div>
+      <div class="col-md-6 my-3">
+          <h3>Closed courses</h3>
+      </div>
+
+      <div class="list-group col-md-6">
+        {% if open_c %}
+            {% for curs in open_c %}
+              {% module CursEntry(curs) %}
+            {% end %}
+        {% else %}
+            <p> NO OPEN COURSES!!!</p>
+        {% end %}
+      </div>
+
+      <div class="list-group col-md-6">
+        {% if closed_c %}
+            {% for curs in closed_c %}
+              {% module CursEntry(curs, button_title="Register") %}
+            {% end %}
+        {% else %}
+            <p> NO CLOSED COURSES!!!</p>
+        {% end %}
+      </div>
+    </div>
+</div>
+
 <br><br><br><br>
 {% if open_c %}
 <p> Open courses list:</p> <br>

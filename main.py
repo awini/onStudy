@@ -37,6 +37,8 @@ from handlers.study_handlers import (StudyFindHandler, StudyLiveHandler, StudyMa
                                      StudyInviteHandler, StudyRegisterHandler)
 from handlers.media_handlers import MaterialHandler
 
+import uimodules
+
 
 class Application(tornado.web.Application):
 
@@ -83,6 +85,7 @@ class Application(tornado.web.Application):
             "xsrf_cookies": True,
             'template_path': sets.TEMPLATE_PATH,
             'debug': sets.DEBUG,
+            'ui_modules': uimodules,
         }
 
         tornado.web.Application.__init__(self, handlers, **settings)

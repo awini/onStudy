@@ -13,21 +13,28 @@ class BaseStudyHandler(BaseHandler):
         return sets.TEMPLATE_PATH + 'study'
 
 
-class StudyLiveHandler(BaseStudyHandler):
-    #@authenticated
+# FIXME: I need it cause using module inside
+class BaseStudyHandlerClear(BaseHandler):
+
+    def get_template_path(self):
+        return sets.TEMPLATE_PATH
+
+
+class StudyLiveHandler(BaseStudyHandlerClear):
+    
     def get(self):
         lessons = self.Course.get_open_course_live_lesson()
-        return self.render('live.html', lessons=lessons)
+        return self.render('study/live.html', lessons=lessons)
 
     def post(self):
         pass
 
 
-class StudyFindHandler(BaseStudyHandler):
+class StudyFindHandler(BaseStudyHandlerClear):
     @authenticated
     def get(self):
         open_courses, closed_courses = self.Course.get_all_course(self.get_current_user())
-        return self.render('find.html', open_c=open_courses, closed_c=closed_courses)
+        return self.render('study/find.html', open_c=open_courses, closed_c=closed_courses)
 
     @authenticated
     def post(self):
