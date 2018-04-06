@@ -84,7 +84,7 @@ class CoursesHandler(BaseCourseHandler):
         return self.render('courses.html', courses=user_courses)
 
 
-class LessonHandler(BaseHandler):
+class LessonHandler(BaseCourseHandler):
 
     def __init__(self, *args, **kwargs):
         self.ACTIONS = {
@@ -93,6 +93,30 @@ class LessonHandler(BaseHandler):
             'change': self.__change_lesson,
         }
         super().__init__(*args, **kwargs)
+
+    @tornado.web.authenticated
+    def get(self):
+        # TODO: lesson_manage.html for manage lesson
+        lesson_id = self.get_argument('lesson')
+        '''
+        <label>Materials: </label><input type="file" name="lessonMaterials" multiple /><br>
+-            {% if course.mode != course.OPEN %}
+-                <label>Home Work: </label><input id="isHomeWork" name="isHomeWork" type="checkbox" onchange="showHomeWorkInput()"><br>
+-                <label hidden class="HWDescr"> Home Work Description </label><br><textarea rows="4" cols="50" class="HWDescr" name="homeWorkDescr" hidden> </textarea><br>
+-            {% end %}
+
+try:
+-            files = self.request.files['lessonMaterials']
+-        except KeyError:
+-            files = []
+for fl in files:
+-                self.LessonMaterial.add_file(fl['filename'], fl['body'], lesson)
+
+        '''
+        self.write(lesson_id)
+        raise NotImplementedError
+        # course = self.Course.get_by_id(course_id, self.get_current_user())
+        # return self.render('lesson_add.html', course=course)
 
     @tornado.web.authenticated
     def post(self, *args, **kwargs):
@@ -106,14 +130,10 @@ class LessonHandler(BaseHandler):
         les_descr = self.get_argument('lessonDescription')
         start_time = self.__parse_datetime(self.get_argument('lessonStartTime'))
         dur = int(self.get_argument('lessonDuration'))
-        course_name = self.get_argument('lessonCursename')
+        course_name = self.get_argument('courseName')
 
-        try:
-            files = self.request.files['lessonMaterials']
-        except KeyError:
-            files = []
 
-        err = self.__err_before_add(les_name, start_time, dur, course_name, files)
+        err = self.__err_before_add(les_name, start_time, dur, course_name)
         if err:
             self.set_status(400)
             self.write(err)
@@ -132,13 +152,10 @@ class LessonHandler(BaseHandler):
                     hw_text = self.get_argument('homeWorkDescr')
                     if hw_text:
                         self.HomeWork.add(hw_text, lesson)
-            # TODO: FIX: if LessonMaterail fail to create, lesson was already created anyway!!!
-            for fl in files:
-                self.LessonMaterial.add_file(fl['filename'], fl['body'], lesson)
 
-        self.redirect('/teach/manage?course={}'.format(course_name))
+        self.set_status(200)
 
-    def __err_before_add(self, les_name, start_time, dur, course_name, files):
+    def __err_before_add(self, les_name, start_time, dur, course_name):
         err_descr = None
         if start_time < datetime.now():
             err_descr = 'Lesson can`t start in past!'
@@ -153,9 +170,6 @@ class LessonHandler(BaseHandler):
                 continue
             if lesson.start_time <= les_end <= lesson.start_time + timedelta(minutes=lesson.duration):
                 err_descr = 'New lesson end time cross {} lesson'.format(lesson.name)
-        for fl in files:
-            if len(fl['filename']) > 255:
-                err_descr = 'File "{}" name must be < 255'.format(fl['filename'])
         return err_descr
 
     def __remove_lesson(self):

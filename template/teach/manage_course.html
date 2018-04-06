@@ -101,17 +101,11 @@ window.onload = function(){
     <div class="modal-body">
         <form action="/teach/lesson" method="post" id="addLessonForm" enctype="multipart/form-data">
             {% module xsrf_form_html() %}
-            <label>Name: </label><input type="text" name="lessonName" required /><br>
-            <label>Description:</label><br><textarea rows="4" cols="50" name="lessonDescription" required> Enter description </textarea><br>
-            <label>Start time: </label><input type="datetime-local" name="lessonStartTime" required /><br>
-            <label>Duration(minutes): </label><input type="number" min="0" name="lessonDuration" required /><br>
-            <label>Materials: </label><input type="file" name="lessonMaterials" multiple /><br>
-            {% if course.mode != course.OPEN %}
-                <label>Home Work: </label><input id="isHomeWork" name="isHomeWork" type="checkbox" onchange="showHomeWorkInput()"><br>
-                <label hidden class="HWDescr"> Home Work Description </label><br><textarea rows="4" cols="50" class="HWDescr" name="homeWorkDescr" hidden> </textarea><br>
-            {% end %}
-            <input type="hidden" id="addLessonCursename" name="lessonCursename" value="{{ course.name }}">
-            <input type="hidden" name="action" value="add">
+            <label>Name: </label><input type="text" id="addLessonName" required /><br>
+            <label>Description:</label><br><textarea rows="4" cols="50" id="addLessonDescription" required> Enter description </textarea><br>
+            <label>Start time: </label><input type="datetime-local" id="addLessonStartTime" required /><br>
+            <label>Duration(minutes): </label><input type="number" min="0" id="addLessonDuration" required /><br>
+            <input type="hidden" id="addLessonCursename" value="{{ course.name }}">
             <input type="submit" value="Add" class="btn btn-default"/>
         </form>
     </div>

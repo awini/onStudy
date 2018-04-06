@@ -57,6 +57,13 @@ class CourseHandler(DbHandlerBase):
 
     @staticmethod
     @DBBridge.query_db
+    def get_by_id(session, course_id, username):
+        user = UserHandler.get(username)
+        course = session.query(Course).filter(Course.id == course_id, Course.owner == user.id).one()
+        return course
+
+    @staticmethod
+    @DBBridge.query_db
     def get(session, course_name):
         course = session.query(Course).filter(Course.name == course_name).one_or_none()
         return course

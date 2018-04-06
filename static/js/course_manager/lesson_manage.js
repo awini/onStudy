@@ -27,7 +27,11 @@ $(document).ready(function(){
               datatype: 'json',
               success: function(data){
                     alert('Success!');
-                    window.location.reload();
+                    if (sendData['action'] == 'add') {
+                        window.location = '';
+                    } else {
+                        window.location.reload();
+                    }
               },
               error: function(data){
                   alert(data['responseText']);
@@ -53,17 +57,16 @@ $(document).ready(function(){
         sendAjax(sendData);
     });
 
-//    $("#addLessonForm").submit(function(event) {
-//        event.preventDefault();
-//        var formData = {
-//            action: "add",
-//            lessonName: $("#addLessonName").val(),
-//            lessonDescription: $("#addLessonDescription").val(),
-//            lessonStartTime: $("#addLessonStartTime").val(),
-//            lessonDuration: $("#addLessonDuration").val(),
-//            courseName: $("#addLessonCursename").val(),
-//            LessonMaterials: $("#addLessonMaterials").val(),
-//        };
-//        sendAjax(formData);
-//    });
+    $("#addLessonForm").submit(function(event) {
+        event.preventDefault();
+        var formData = {
+            action: "add",
+            lessonName: $("#addLessonName").val(),
+            lessonDescription: $("#addLessonDescription").val(),
+            lessonStartTime: $("#addLessonStartTime").val(),
+            lessonDuration: $("#addLessonDuration").val(),
+            courseName: $("#addLessonCursename").val(),
+        };
+        sendAjax(formData);
+    });
 });
