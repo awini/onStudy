@@ -151,6 +151,7 @@ class HomeWork(Base):
     __tablename__ = 'home_work'
 
     id = Column(Integer, primary_key=True)
+    title = Column(String(length=200))
     description = Column(Text)
     lesson = Column(Integer, ForeignKey('lesson.id'))
 

@@ -90,56 +90,34 @@ class LessonHandler(BaseCourseHandler):
         self.ACTIONS = {
             'add': self.__add_lesson,
             'remove': self.__remove_lesson,
-            'change': self.__change_lesson,
+            'modify': self.__modify_lesson,
         }
         super().__init__(*args, **kwargs)
 
     @tornado.web.authenticated
     def get(self):
+        # TODO: check owner
         # TODO: lesson_manage.html for manage lesson
-        lesson_id = self.get_argument('lesson')
-        '''
-        <label>Materials: </label><input type="file" name="lessonMaterials" multiple /><br>
--            {% if course.mode != course.OPEN %}
--                <label>Home Work: </label><input id="isHomeWork" name="isHomeWork" type="checkbox" onchange="showHomeWorkInput()"><br>
--                <label hidden class="HWDescr"> Home Work Description </label><br><textarea rows="4" cols="50" class="HWDescr" name="homeWorkDescr" hidden> </textarea><br>
--            {% end %}
+        lesson = self.Lesson.get_by_id(self.get_argument('lesson'))
 
-try:
--            files = self.request.files['lessonMaterials']
--        except KeyError:
--            files = []
-for fl in files:
--                self.LessonMaterial.add_file(fl['filename'], fl['body'], lesson)
-
-        '''
-        self.write(lesson_id)
-        raise NotImplementedError
-        # course = self.Course.get_by_id(course_id, self.get_current_user())
-        # return self.render('lesson_add.html', course=course)
+        return self.render('lesson_manage.html', lesson=lesson)
 
     @tornado.web.authenticated
     def post(self, *args, **kwargs):
         # TODO: check owner
-        # TODO: add option for remove material
         action = self.get_argument('action')
         self.ACTIONS[action]()
 
     def __add_lesson(self):
-        les_name = self.get_argument('lessonName')
-        les_descr = self.get_argument('lessonDescription')
-        start_time = self.__parse_datetime(self.get_argument('lessonStartTime'))
-        dur = int(self.get_argument('lessonDuration'))
-        course_name = self.get_argument('courseName')
+        les_name, les_descr, start_time, dur, course_name = self.__collect_lesson_data()
 
-
-        err = self.__err_before_add(les_name, start_time, dur, course_name)
+        err = self.__check_lesson(les_name, les_descr, start_time, dur, course_name)
         if err:
             self.set_status(400)
             self.write(err)
             return
         else:
-            lesson = self.Lesson.create_lesson(
+            self.Lesson.create_lesson(
                 self.get_current_user(),
                 course_name,
                 les_name,
@@ -147,15 +125,9 @@ for fl in files:
                 start_time,
                 dur,
             )
-            if lesson._course.mode != Course.OPEN:
-                if self.get_argument('isHomeWork', default=None) == 'on':
-                    hw_text = self.get_argument('homeWorkDescr')
-                    if hw_text:
-                        self.HomeWork.add(hw_text, lesson)
-
         self.set_status(200)
 
-    def __err_before_add(self, les_name, start_time, dur, course_name):
+    def __check_lesson(self, les_name, les_descr, start_time, dur, course_name):
         err_descr = None
         if start_time < datetime.now():
             err_descr = 'Lesson can`t start in past!'
@@ -163,6 +135,8 @@ for fl in files:
             err_descr = 'Lessond duration must be in diaposon (10, 300)'
         if self.Lesson.check_in_course(les_name, course_name):
             err_descr = 'Lesson "{}" already exist in course "{}"'.format(les_name, course_name)
+        if not les_descr:
+            err_descr = 'Description must contain some characters...'
         les_end = start_time + timedelta(minutes=dur)
         for lesson in self.Lesson.get_all_by_course(course_name):
             if lesson.start_time <= start_time <= lesson.start_time + timedelta(minutes=lesson.duration):
@@ -173,15 +147,95 @@ for fl in files:
         return err_descr
 
     def __remove_lesson(self):
+        # TODO: check owner
         course_name = self.get_argument('courseName')
         lesson_name = self.get_argument('lessonName')
         username = self.get_current_user()
         self.Lesson.delete_lesson(username, course_name, lesson_name)
 
-    def __change_lesson(self):
-        print('change lesson')
-        raise NotImplementedError
+    def __modify_lesson(self):
+        # TODO: check if new values is valid
+        lesson_data = self.__collect_lesson_data()
+        lesson_id = self.get_argument('lessonid')
+        lesson = self.Lesson.modify_lesson(self.get_current_user(), lesson_id, *lesson_data)
+        if not lesson:
+            self.set_status(400)
+            return
+        self.redirect('/teach/lesson?lesson={}'.format(lesson.id))
+
+    def __collect_lesson_data(self):
+        les_name = self.get_argument('lessonName')
+        les_descr = self.get_argument('lessonDescription')
+        start_time = self.__parse_datetime(self.get_argument('lessonStartTime'))
+        dur = int(self.get_argument('lessonDuration'))
+        course_name = self.get_argument('courseName', default=None)
+        return les_name, les_descr, start_time, dur, course_name
 
     def __parse_datetime(self, datetime_str):
         date_processing = datetime_str.replace('T', '-').replace(':', '-').split('-')
         return datetime(*[int(v) for v in date_processing])
+
+
+class MaterialManageHandler(BaseCourseHandler):
+
+    def __init__(self, *args, **kwargs):
+        self.ACTIONS = {
+            'delete': self.__delete_material,
+            'addMaterial': self.__add_material,
+        }
+        super().__init__(*args, **kwargs)
+
+    @tornado.web.authenticated
+    def post(self, *args, **kwargs):
+        username = self.get_current_user()
+        lesson_id = self.get_argument('lessonid')
+        material_id = self.get_argument('materialid', default=None)
+        if not self.LessonMaterial.check_material(username, lesson_id, material_id):
+            self.set_status(400)
+            return
+
+        self.ACTIONS[self.get_argument('action')](lesson_id=lesson_id, material_id=material_id)
+        self.redirect('/teach/lesson?lesson={}'.format(lesson_id))
+
+    def __add_material(self, **kwargs):
+        lesson = self.Lesson.get_by_id(kwargs['lesson_id'])
+        try:
+            files = self.request.files['lessonMaterials']
+        except KeyError:
+            files = []
+        for fl in files:
+            self.LessonMaterial.add_file(fl['filename'], fl['body'], lesson)
+
+    def __delete_material(self, **kwargs):
+        self.LessonMaterial.delete_by_material_id(kwargs['material_id'])
+
+
+class HomeWorkManageHandler(BaseCourseHandler):
+
+    def __init__(self, *args, **kwargs):
+        self.ACTIONS = {
+            'addHomeWork': self.__add_homework,
+            'delHomeWork': self.__delete_homework,
+        }
+        super().__init__(*args, **kwargs)
+
+    @tornado.web.authenticated
+    def post(self, *args, **kwargs):
+        username = self.get_current_user()
+        action = self.get_argument('action')
+        lesson = self.Lesson.check_owner(username, self.get_argument('lessonid'))
+        if not lesson or lesson._course.mode == lesson._course.OPEN:
+            self.set_status(400)
+            return
+        self.ACTIONS[action](lesson)
+        self.redirect('/teach/lesson?lesson={}'.format(lesson.id))
+
+    def __add_homework(self, lesson):
+        hw_descr = self.get_argument('homeWorkDescr')
+        hw_title = self.get_argument('HWTitle')
+        self.HomeWork.add(hw_title, hw_descr, lesson)
+
+    def __delete_homework(self, lesson):
+        hw_id = self.get_argument('homeworkid')
+        if self.HomeWork.check_in_lesson(lesson, hw_id):
+            self.HomeWork.delete_by_id(hw_id)

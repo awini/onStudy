@@ -1,23 +1,74 @@
 {% extends "../base.html" %}
 
-{% block title %}Add lesson{% end %}
+{% block title %}Manage lesson{% end %}
 
 {% block content %}
+<h3 style="color:red">Статус лекции "{{ lesson.name }}":</h3>
+Stream key: {{ lesson.stream_key}}?pphrs={{ lesson.stream_pw }}<br>
+State: {{ lesson.state }} <br>
+<br>
 
-    <form action="/teach/lesson" method="post" id="addLessonForm" enctype="multipart/form-data">
+<h3 style="color:red">Изменить основные параметры лекции "{{ lesson.name }}":</h3>
+<!--enctype="multipart/form-data"-->
+    <form action="/teach/lesson" method="post">
         {% module xsrf_form_html() %}
-        <label>Name: </label><input type="text" name="lessonName" required /><br>
-        <label>Description:</label><br><textarea rows="4" cols="50" name="lessonDescription" required> Enter description </textarea><br>
-        <label>Start time: </label><input type="datetime-local" name="lessonStartTime" required /><br>
-        <label>Duration(minutes): </label><input type="number" min="0" name="lessonDuration" required /><br>
-        <label>Materials: </label><input type="file" name="lessonMaterials" multiple /><br>
-
-            <!--<label>Home Work: </label><input id="isHomeWork" name="isHomeWork" type="checkbox" onchange="showHomeWorkInput()"><br>-->
-            <!--<label hidden class="HWDescr"> Home Work Description </label><br><textarea rows="4" cols="50" class="HWDescr" name="homeWorkDescr" hidden> </textarea><br>-->
-        <input type="hidden" id="addLessonCursename" name="lessonCursename" value="{{ course.name }}">
-        <input type="hidden" name="action" value="add">
-        <input type="submit" value="Add" class="btn btn-default"/>
+        <label>Name: </label><input type="text" name="lessonName" value="{{ lesson.name }}" required/><br>
+        <label>Description:</label><br><textarea rows="4" cols="50" name="lessonDescription" required> {{ lesson.description }} </textarea><br>
+        <label>Start time: </label><input type="datetime-local" name="lessonStartTime" value="{{ lesson.start_time.strftime('%Y-%m-%dT%H:%M') }}" required/><br>
+        <label>Duration(minutes): </label><input type="number" min="0" name="lessonDuration" value="{{ lesson.duration }}" /><br>
+        <input type="hidden" name="lessonid" value="{{lesson.id}}">
+        <input type="hidden" name="action" value="modify">
+        <input type="submit" value="Modify" class="btn btn-default"/>
     </form>
+<br>
+<h3 style="color:red">Материалы лекции "{{ lesson.name }}":</h3>
+{% for m in lesson._lesson_material %}
+    <div class="form-inline">
+        <a href="/media/material/{{ m.real_name }}">{{ m.pretty_name}}</a> <br>
+        <form action="/teach/lesson/material" method="post">
+            {% module xsrf_form_html() %}
+            <input type="hidden" name="lessonid" value="{{lesson.id}}">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="materialid" value="{{ m.id }}">
+            <input type="submit" value="X" class="btn btn-default"/>
+        </form>
+    </div>
+{% end for %}
+<br>
+<form action="/teach/lesson/material" method="post" enctype="multipart/form-data">
+    {% module xsrf_form_html() %}
+    <input type="file" name="lessonMaterials" multiple required/><br>
+    <input type="hidden" name="lessonid" value="{{ lesson.id }}">
+    <input type="hidden" name="action" value="addMaterial">
+    <input type="submit" value="Add New" class="btn btn-default"/>
+</form>
+<br>
 
+{% if lesson._course.mode != lesson._course.OPEN %}
+<h3 style="color:red">Домашнее задание лекции "{{ lesson.name }}":</h3>
+{% for hw in lesson._home_work %}
+    <div class="form-inline">
+        <p title="{{ hw.description }}">{{ hw.title }}</p>
+        <form action="/teach/lesson/homework" method="post">
+            {% module xsrf_form_html() %}
+            <input type="hidden" name="lessonid" value="{{lesson.id}}">
+            <input type="hidden" name="action" value="delHomeWork">
+            <input type="hidden" name="homeworkid" value="{{ hw.id }}">
+            <input type="submit" value="X" class="btn btn-default"/>
+        </form>
+    </div>
 
+<br>
+<br>
+{% end for %}
+<form action="/teach/lesson/homework" method="post">
+    {% module xsrf_form_html() %}
+    <label>Title: </label><input type="text" name="HWTitle" required/><br>
+    <textarea rows="4" cols="50" class="HWDescr" name="homeWorkDescr" required> </textarea><br>
+    <input type="hidden" name="lessonid" value="{{ lesson.id }}">
+    <input type="hidden" name="action" value="addHomeWork">
+    <input type="submit" value="Add New" class="btn btn-default"/>
+</form>
+
+{% end if %}
 {% end %}

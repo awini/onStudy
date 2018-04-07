@@ -202,6 +202,11 @@ class LessonHandler(DbHandlerBase):
 
     @staticmethod
     @DBBridge.query_db
+    def get_by_id(session, lesson_id):
+        return session.query(Lesson).filter(Lesson.id == lesson_id).one()
+
+    @staticmethod
+    @DBBridge.query_db
     def get_by_keys(session, stream_key, stream_pw):
         return session.query(Lesson).filter(
             Lesson.stream_key == stream_key, Lesson.stream_pw == stream_pw
@@ -213,6 +218,13 @@ class LessonHandler(DbHandlerBase):
         return session.query(Lesson).join(Course).filter(
             Lesson.name == lec_name, Course.name == course_name
         ).one_or_none()
+
+    @staticmethod
+    def check_owner(username, lesson_id):
+        lesson = LessonHandler.get_by_id(lesson_id)
+        if lesson._course._owner.name == username:
+            return lesson
+
 
     @staticmethod
     @DBBridge.query_db
@@ -276,6 +288,20 @@ class LessonHandler(DbHandlerBase):
                 session.delete(l)
                 return l
 
+    @staticmethod
+    @DBBridge.modife_db
+    def modify_lesson(session, username, les_id, les_name, les_descr, start_time, dur, course_name):
+        # TODO: check if new data valid
+        # TODO: check owner
+        lesson = session.query(Lesson).filter(Lesson.id == les_id).one()
+        if lesson._course._owner.name != username:
+            return None  # not possible in valid request
+        lesson.name = les_name
+        lesson.description = les_descr
+        lesson.start_time = start_time
+        lesson.duration = dur
+        return lesson
+
 
 class CourseMembersHandler(DbHandlerBase):
 
@@ -336,6 +362,20 @@ class CourseInvitesHandler(DbHandlerBase):
 
 
 class LessonMaterialHandler(DbHandlerBase):
+
+    @staticmethod
+    @DBBridge.query_db
+    def check_material(session, username, lesson_id, material_id):
+        lesson = LessonHandler.get_by_id(lesson_id)
+        if lesson._course._owner.name != username:
+            return False
+        if not material_id:
+            return True
+        material_id = int(material_id)
+        for m in lesson._lesson_material:
+            if m.id == material_id:
+                return True
+
     @staticmethod
     @DBBridge.query_db
     def get_with_path(session, file_name):
@@ -364,6 +404,14 @@ class LessonMaterialHandler(DbHandlerBase):
 
     @staticmethod
     @DBBridge.modife_db
+    def delete_by_material_id(session, material_id):
+        material = session.query(LessonMaterial).filter(LessonMaterial.id == material_id).one()
+        session.delete(material)
+        f_path = Path(sets.MEDIA_DIR) / material.parent_dir / material.real_name
+        f_path.unlink()
+
+    @staticmethod
+    @DBBridge.modife_db
     def delete_by_lesson(session, lesson):
         files = session.query(LessonMaterial).filter(LessonMaterial.lesson == lesson.id)
         for fl in files:
@@ -375,11 +423,25 @@ class LessonMaterialHandler(DbHandlerBase):
 class HomeWorkHandler(DbHandlerBase):
 
     @staticmethod
+    def check_in_lesson(lesson, hw_id):
+        hw_id = int(hw_id)
+        for hw in lesson._home_work:
+            if hw.id == hw_id:
+                return True
+
+    @staticmethod
     @DBBridge.modife_db
-    def add(session, hw_desct, lesson):
+    def add(session, hw_title, hw_desct, lesson):
         hw = HomeWork(
+            title=hw_title,
             description=hw_desct,
             lesson=lesson.id,
         )
         session.add(hw)
         return hw
+
+    @staticmethod
+    @DBBridge.modife_db
+    def delete_by_id(session, hw_id):
+        hw = session.query(HomeWork).filter(HomeWork.id == hw_id).one()
+        session.delete(hw)

@@ -36,7 +36,7 @@ window.onload = function(){
           </tr>
 
           <tr>
-            <td>{{ l.name }}</td>
+            <td><a href="/teach/lesson?lesson={{ l.id }}">{{ l.name }}</a></td>
             <td>{{ l.description }}</td>
             <td>{{ l.start_time}}</td>
             <td>{{ l.duration }}</td>
@@ -49,12 +49,6 @@ window.onload = function(){
             {% end %}
           </tr>
         </table>
-        {% for material in l._lesson_material %}
-            <a href="/media/material/{{ material.real_name }}">{{ material.pretty_name}}</a> <br>
-        {% end %}
-            {% if l._home_work %}
-                <p>Home Work Description: {{ l._home_work[0].description }}</p>
-            {% end %}
         <br><br><br>
         {% end %}
     {% else %}
@@ -99,7 +93,7 @@ window.onload = function(){
       <h4 class="modal-title">Adding Lesson</h4>
     </div>
     <div class="modal-body">
-        <form action="/teach/lesson" method="post" id="addLessonForm" enctype="multipart/form-data">
+        <form action="/teach/lesson" method="post" id="addLessonForm" >
             {% module xsrf_form_html() %}
             <label>Name: </label><input type="text" id="addLessonName" required /><br>
             <label>Description:</label><br><textarea rows="4" cols="50" id="addLessonDescription" required> Enter description </textarea><br>
