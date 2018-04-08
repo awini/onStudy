@@ -20,6 +20,7 @@
     <th>Lesson Start Time</th>
     <th>Lesson Duration</th>
     <th>Lesson State</th>
+    <th>HomeWork</th>
 
   </tr>
     {% for cm in user_in %}
@@ -39,6 +40,11 @@
               {% else %}
             <td>{{ lesson.state }}</td>
               {% end %}
+            {% if len(lesson._home_work) > 0 %}
+                <td><a href="/study/homework?lesson={{ lesson.id }}">Do HomeWork!</a></td>
+            {% else %}
+                <td>No homework in lesson</td>
+            {% end if %}
           </tr>
         {% end %}
     {% end %}

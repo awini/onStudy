@@ -156,7 +156,7 @@ class HomeWork(Base):
     lesson = Column(Integer, ForeignKey('lesson.id'))
 
     _lesson = relationship("Lesson", back_populates="_home_work")
-    _home_work_answer = relationship("HomeWorkAnswer", back_populates="_home_work")
+    _home_work_answer = relationship("HomeWorkAnswer", back_populates="_home_work", cascade="save-update, merge, delete")
 
 
 class HomeWorkAnswer(Base):

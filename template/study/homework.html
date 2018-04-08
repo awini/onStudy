@@ -1,0 +1,26 @@
+{% extends "../base.html" %}
+
+{% block title %}HomeWork{% end %}
+
+{% block content %}
+
+{% for hw in homeworks %}
+    <p style="color:red">{{ hw.title }}: </p>
+    <textarea rows="4" cols="50" readonly> {{ hw.description }} </textarea><br>
+
+    {% if hw.id in answers %}
+        <p style="color:red">Your answer: </p>
+        <p>{{ answers[hw.id] }}</p>
+    {% else %}
+        <p> Your solution:</p>
+        <form action="/study/homework" method="post">
+            {% module xsrf_form_html() %}
+            <textarea rows="4" cols="50" name="answer" required> </textarea><br>
+            <input type="hidden" name="homeworkid" value="{{ hw.id }}">
+            <input type="submit" value="Submit" class="btn btn-default"/>
+        </form>
+    {% end if %}
+    --------------------------------------------------------------------<br>
+{% end for %}
+
+{% end %}

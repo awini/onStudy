@@ -114,3 +114,28 @@ class StudyCourseHandler(BaseStudyHandler):
 
     def render_course(self, course):
         return self.render('course.html', course=course)
+
+
+class StudyHomeWorkHandler(BaseStudyHandler):
+
+    @authenticated
+    def get(self):
+        # TODO: check if user had registred on this course
+        lesson_id = self.get_argument('lesson')
+        homeworks = self.HomeWork.get_all_in_lesson(lesson_id)
+        answers = self.HomeWorkAnswer.get_user_anwers(self.get_current_user(), homeworks)
+        return self.render('homework.html', homeworks=homeworks, answers=answers)
+
+    @authenticated
+    def post(self):
+        # TODO: check if user already write answer for hw_id
+        user = self.get_current_user()
+        answer = self.get_argument('answer')
+        hw_id = self.get_argument('homeworkid')
+        lesson = self.HomeWork.check_by_listener(user, hw_id)
+        if not lesson:
+            self.set_status(400)
+            return
+
+        self.HomeWorkAnswer.add_answer(user, hw_id, answer)
+        self.redirect('/study/homework?lesson={}'.format(lesson.id))

@@ -3,9 +3,10 @@ from pathlib import Path
 from uuid import uuid4
 
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm import load_only
 from sqlalchemy import or_
 
-from db.models import CourseMembers, Course, User, Lesson, CourseInvites, LessonMaterial, HomeWork
+from db.models import CourseMembers, Course, User, Lesson, CourseInvites, LessonMaterial, HomeWork, HomeWorkAnswer
 from db.DBBridge import DBBridge
 from settings import sets
 
@@ -430,6 +431,25 @@ class HomeWorkHandler(DbHandlerBase):
                 return True
 
     @staticmethod
+    def check_by_listener(username, hw_id):
+        user = UserHandler.get(username)
+        homework = HomeWorkHandler.get_by_id(hw_id)
+        lesson = homework._lesson
+        for course_member in lesson._course._course_member:
+            if course_member.member == user.id:
+                return lesson
+
+    @staticmethod
+    @DBBridge.query_db
+    def get_by_id(session, hw_id):
+        return session.query(HomeWork).filter(HomeWork.id == hw_id).one()
+
+    @staticmethod
+    @DBBridge.query_db
+    def get_all_in_lesson(session, lesson_id):
+        return session.query(HomeWork).filter(HomeWork.lesson == lesson_id)
+
+    @staticmethod
     @DBBridge.modife_db
     def add(session, hw_title, hw_desct, lesson):
         hw = HomeWork(
@@ -445,3 +465,30 @@ class HomeWorkHandler(DbHandlerBase):
     def delete_by_id(session, hw_id):
         hw = session.query(HomeWork).filter(HomeWork.id == hw_id).one()
         session.delete(hw)
+
+
+class HomeWorkAnswerHandler(DbHandlerBase):
+
+    @staticmethod
+    @DBBridge.modife_db
+    def add_answer(session, username, hw_id, answer):
+        user = UserHandler.get(username)
+        hw_answer = HomeWorkAnswer(
+            description=answer,
+            home_work=hw_id,
+            source=user.id,
+        )
+        session.add(hw_answer)
+        return hw_answer
+
+    @staticmethod
+    @DBBridge.modife_db
+    def get_user_anwers(session, username, homeworks):
+        user = UserHandler.get(username)
+        user_anwers = {}
+        for answer in session.query(HomeWorkAnswer).filter(
+            HomeWorkAnswer.source == user.id,
+            HomeWorkAnswer.home_work.in_(homeworks.options(load_only('id')))
+        ):
+            user_anwers[answer.home_work] = answer.description
+        return user_anwers
