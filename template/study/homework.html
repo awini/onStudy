@@ -10,7 +10,13 @@
 
     {% if hw.id in answers %}
         <p style="color:red">Your answer: </p>
-        <p>{{ answers[hw.id] }}</p>
+        <p>{{ answers[hw.id].description }}</p>
+        {% if answers[hw.id].grade == None %}
+            <p style="color:green">Grade: Has`t graded yet</p>
+        {% else %}
+            <p style="color:green">Grade: {{ answers[hw.id].grade }}</p>
+        {% end if %}
+
     {% else %}
         <p> Your solution:</p>
         <form action="/study/homework" method="post">

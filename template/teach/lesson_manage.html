@@ -48,8 +48,8 @@ State: {{ lesson.state }} <br>
 <h3 style="color:red">Домашнее задание лекции "{{ lesson.name }}":</h3>
 {% for hw in lesson._home_work %}
     <div class="form-inline">
-        <p title="{{ hw.description }}">{{ hw.title }}</p>
-        <form action="/teach/lesson/homework" method="post">
+        <a href="/teach/lesson/homework/check?homework={{ hw.id }}">{{ hw.title }}</a>
+        <form action="/teach/lesson/homework" method="post" onsubmit="return confirm('Are you sure you want to delete homework?');">
             {% module xsrf_form_html() %}
             <input type="hidden" name="lessonid" value="{{lesson.id}}">
             <input type="hidden" name="action" value="delHomeWork">

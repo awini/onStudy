@@ -483,6 +483,15 @@ class HomeWorkAnswerHandler(DbHandlerBase):
 
     @staticmethod
     @DBBridge.modife_db
+    def grade_answer(session, answer_id, grade):
+        print(answer_id)
+        print(grade)
+        answer = session.query(HomeWorkAnswer).filter(HomeWorkAnswer.id == answer_id).one()
+        answer.grade = grade
+        return answer
+
+    @staticmethod
+    @DBBridge.modife_db
     def get_user_anwers(session, username, homeworks):
         user = UserHandler.get(username)
         user_anwers = {}
@@ -490,5 +499,10 @@ class HomeWorkAnswerHandler(DbHandlerBase):
             HomeWorkAnswer.source == user.id,
             HomeWorkAnswer.home_work.in_(homeworks.options(load_only('id')))
         ):
-            user_anwers[answer.home_work] = answer.description
+            user_anwers[answer.home_work] = answer
         return user_anwers
+
+    @staticmethod
+    @DBBridge.modife_db
+    def get_all_homework_answers(session, hw_id):
+        return session.query(HomeWorkAnswer).filter(HomeWorkAnswer.home_work == hw_id)

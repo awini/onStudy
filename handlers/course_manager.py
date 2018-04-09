@@ -239,3 +239,25 @@ class HomeWorkManageHandler(BaseCourseHandler):
         hw_id = self.get_argument('homeworkid')
         if self.HomeWork.check_in_lesson(lesson, hw_id):
             self.HomeWork.delete_by_id(hw_id)
+
+
+class HomeWorkCheckHandler(BaseCourseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        # TODO: check owner
+        hw_id = self.get_argument('homework')
+        answers = self.HomeWorkAnswer.get_all_homework_answers(hw_id)
+        self.render('homework_check.html', answers=answers)
+
+    @tornado.web.authenticated
+    def post(self, *args, **kwargs):
+        # TODO: check it is valid id for valid homework
+        # TODO: check if already graded
+        answer_id = self.get_argument('answerid')
+        grade = self.get_argument('gradeValue')
+        if 0 > int(grade) > 100:
+            self.set_status(400)
+            return
+        answer = self.HomeWorkAnswer.grade_answer(answer_id, grade)
+        self.redirect('/teach/lesson/homework/check?homework={}'.format(answer.home_work))
+

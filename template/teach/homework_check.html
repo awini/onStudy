@@ -1,0 +1,36 @@
+{% extends "../base.html" %}
+
+{% block title %}HomeWork Check{% end %}
+
+{% block content %}
+
+<p> Home Work Title: {{ answers[0]._home_work.title }} </p>
+<p> Home Work Description: {{ answers[0]._home_work.description }} </p>
+
+<table>
+    <tr>
+        <th>User Name</th>
+        <th>User Answer</th>
+        <th>Your Grade</th>
+    </tr>
+    {% for ans in answers %}
+        <tr>
+            <td>{{ ans._source.name }}</td>
+            <td>{{ ans.description }}</td>
+            {% if ans.grade == None %}
+                <td>
+                    <form action="/teach/lesson/homework/check" method="post">
+                        {% module xsrf_form_html() %}
+                        <input type="number" min="0" max="100" name="gradeValue" required/>
+                        <input type="hidden" name="answerid" value="{{ ans.id }}">
+                        <input type="submit" value="Estimate" class="btn btn-default"/>
+                    </form>
+                </td>
+            {% else %}
+                <td>{{ ans.grade }}</td>
+            {% end if %}
+        </tr>
+    {% end for %}
+</table>
+
+{% end %}
