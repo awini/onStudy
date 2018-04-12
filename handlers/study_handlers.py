@@ -97,7 +97,7 @@ class StudyRegisterHandler(BaseStudyHandler):
             self.set_status(400)
 
 
-class StudyCourseHandler(BaseStudyHandler):
+class StudyCourseHandler(BaseStudyHandlerClear):
 
     def get(self, course_id, *args, **kwargs):
         course = self.Course.get_course_by_id(course_id)
@@ -113,7 +113,25 @@ class StudyCourseHandler(BaseStudyHandler):
         self.render_course(course)
 
     def render_course(self, course):
-        return self.render('course.html', course=course)
+        return self.render('study/course.html', course=course)
+
+class StudyLessonHandler(BaseStudyHandlerClear):
+
+    def get(self, lesson_id, *args, **kwargs):
+        lesson = self.Lesson.get_by_id(lesson_id)
+        if lesson._course.mode == Course.OPEN:
+            return self.get_open_lesson(lesson)
+        return self.get_not_open_lesson(lesson)
+
+    def get_open_lesson(self, lesson):
+        self.render_lesson(lesson)
+
+    @authenticated
+    def get_not_open_lesson(self, lesson):
+        self.render_lesson(lesson)
+
+    def render_lesson(self, lesson):
+        return self.render('study/lesson.html', lesson=lesson)
 
 
 class StudyHomeWorkHandler(BaseStudyHandler):
