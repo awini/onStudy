@@ -6,7 +6,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm import load_only
 from sqlalchemy import or_
 
-from db.models import CourseMembers, Course, User, Lesson, CourseInvites, LessonMaterial, HomeWork, HomeWorkAnswer
+from db.models import (CourseMembers, Course, User, Lesson, LessonAccess, CourseAccess,
+                       CourseInvites, LessonMaterial, HomeWork, HomeWorkAnswer)
 from db.DBBridge import DBBridge
 from settings import sets
 
@@ -41,26 +42,207 @@ class UserHandler(DbHandlerBase):
         session.add(user)
 
 
+class CourseAccessHandler(DbHandlerBase):
+    @staticmethod
+    @DBBridge.modife_db
+    def get_all_by_course(session, course_id):
+        return session.query(CourseAccess).filter(CourseAccess.course == course_id)
+
+    @staticmethod
+    @DBBridge.modife_db
+    def check_any_access(session, user, course):
+        return session.query(CourseAccess).filter(CourseAccess.course == course.id,
+                                                  CourseAccess.user == user.id,
+                                                  ).one_or_none()
+
+    @staticmethod
+    @DBBridge.modife_db
+    def check_write_access(session, username, course_id):
+        user = UserHandler.get(username)
+        course = CourseHandler.get_by_id(course_id)
+        return session.query(CourseAccess).filter(CourseAccess.course == course.id,
+                                                  CourseAccess.user == user.id,
+                                                  CourseAccess.access == CourseAccess.MODERATE,
+                                                  ).one_or_none()
+
+    @staticmethod
+    @DBBridge.modife_db
+    def add_browse_access(session, username, course):
+        user = UserHandler.get(username)
+        if not CourseAccessHandler.check_any_access(user, course):
+            access = CourseAccess(
+                course=course.id,
+                user=user.id,
+                access=CourseAccess.BROWSE,
+            )
+            session.add(access)
+            return access
+
+    @staticmethod
+    @DBBridge.modife_db
+    def add_moderate_access(session, user, course):
+        access = CourseAccess(
+            course=course.id,
+            user=user.id,
+            access=CourseAccess.MODERATE,
+        )
+        log.info('Add moderate access for "{}" to course "{}"'.format(user.name, course.name))
+        session.add(access)
+
+    @staticmethod
+    @DBBridge.query_db
+    def get_all_by_lector(session, username):
+        user = UserHandler.get(username)
+        return session.query(Course).join(CourseAccess).filter(CourseAccess.user == user.id)
+
+    @staticmethod
+    def check_write_access_by_lesson(username, lesson: Lesson):
+        user = UserHandler.get(username)
+        course = lesson._course
+        if course.owner == user.id:
+            return True
+        for c_access in course._course_access:
+            if c_access.user == user.id and c_access.access == CourseAccess.MODERATE:
+                return True
+
+    @staticmethod
+    @DBBridge.modife_db
+    def modify_access_many(session, course_id, new_right):
+        #  newRight: {'user1': 'Browse'}
+        course = CourseHandler.get_by_id(course_id)
+        for access, user in session.query(CourseAccess, User).join(User).filter(
+                        CourseAccess.course == course_id):
+            if course.owner == user.id:
+                continue
+            if new_right[user.name] == 'Remove':
+                LessonAccessHandler.delete_all_by_course(course, user.name)
+                CourseAccessHandler.delete_access(access)
+            else:
+                CourseAccessHandler.modify_access(access, new_right[user.name])
+
+
+    @staticmethod
+    @DBBridge.modife_db
+    def modify_access(session, course_access: CourseAccess, access: str):
+        course_access.access = access
+
+    @staticmethod
+    @DBBridge.modife_db
+    def delete_access(session, access):
+        session.delete(access)
+
+
+class LessonAccessHandler(DbHandlerBase):
+
+    @staticmethod
+    def add_access_to_all_partners(course_id, lesson_id):
+        for course_access in CourseAccessHandler.get_all_by_course(course_id):
+            if course_access.access == CourseAccess.MODERATE:
+                lesson_access = LessonAccess.MODERATE
+            else:
+                lesson_access = LessonAccess.VIEW
+            LessonAccessHandler.add_access(course_access.user, lesson_id, lesson_access)
+
+    @staticmethod
+    def add_access_to_all_lesson(username, course, access):
+        user = UserHandler.get(username)
+        for lesson in course._lesson:
+            LessonAccessHandler.add_access(user.id, lesson.id, access)
+
+
+    @staticmethod
+    @DBBridge.modife_db
+    def add_access(session, user_id, lesson_id, access):
+        access = LessonAccess(
+            user=user_id,
+            lesson=lesson_id,
+            access=access,
+        )
+        session.add(access)
+        return access
+
+    @staticmethod
+    def check_write_access(username, lesson: Lesson):
+        user = UserHandler.get(username)
+        for l_access in lesson._lesson_access:
+            if l_access.user == user.id and l_access.access == LessonAccess.MODERATE:
+                return True
+
+    @staticmethod
+    @DBBridge.query_db
+    def check_any_access(session, username, lesson: Lesson):
+        user = UserHandler.get(username)
+        access = session.query(LessonAccess).filter(
+            LessonAccess.user == user.id, LessonAccess.lesson == lesson.id).one_or_none()
+        return access
+
+    @staticmethod
+    @DBBridge.query_db
+    def get_all_by_partner_and_course(session, username, course_id):
+        user = UserHandler.get(username)
+        lesson_access = {}
+        query = session.query(LessonAccess).join(Lesson).filter(LessonAccess.user == user.id, Lesson.course == course_id)
+        for access in query:
+            lesson_access[access.lesson] = access
+        return lesson_access
+
+    @staticmethod
+    @DBBridge.modife_db
+    def modify_access_many(session, course_id, username, new_right):
+        #  newRight: {les111: "Teach", les2: "View", lesson_3: "View"}
+        user = UserHandler.get(username)
+        for access, l_name in session.query(LessonAccess, Lesson.name).join(Lesson).filter(
+                        Lesson.course == course_id, LessonAccess.user == user.id):
+            LessonAccessHandler.modify_access(access, new_right[l_name])
+
+
+    @staticmethod
+    @DBBridge.modife_db
+    def modify_access(session, lesson_access: LessonAccess, access: str):
+        lesson_access.access = access
+
+    @staticmethod
+    @DBBridge.modife_db
+    def delete_all_by_course(session, course: Course, username):
+        user = UserHandler.get(username)
+        for access in session.query(LessonAccess).join(Lesson).filter(
+                        Lesson.course == course.id, LessonAccess.user == user.id):
+            session.delete(access)
+
+
 class CourseHandler(DbHandlerBase):
+    @staticmethod
+    @DBBridge.query_db
+    def get_all_by_partner(session, username):
+        return session.query(Course).join(CourseAccess).join(User).filter(
+            User.name == username,
+            CourseAccess.user == User.id,
+        )
 
     @staticmethod
     @DBBridge.query_db
-    def get_by_owner(session, course_name, username):
+    def get_by_owner(session, course_id, username, strict=True):
         user = UserHandler.get(username)
-        lessons = []
-        members = []
-        course = session.query(Course).filter(Course.name == course_name, Course.owner == user.id).one()
-        for l in course._lesson:
-            lessons.append(l)
-        for member in course._course_member:
-            members.append(member._member.name)
-        return course, lessons, members
+        course = session.query(Course).filter(Course.id == course_id, Course.owner == user.id)
+        if strict:
+            return course.one()
+        else:
+            return course.one_or_none()
 
     @staticmethod
     @DBBridge.query_db
-    def get_by_id(session, course_id, username):
+    def get_by_partner(session, course_id, username):
         user = UserHandler.get(username)
-        course = session.query(Course).filter(Course.id == course_id, Course.owner == user.id).one()
+        access = session.query(CourseAccess).join(Course).filter(
+            Course.id == course_id,
+            CourseAccess.user == user.id,
+        ).one()
+        return access._course, access, user
+
+    @staticmethod
+    @DBBridge.query_db
+    def get_by_id(session, course_id):
+        course = session.query(Course).filter(Course.id == course_id).one()
         return course
 
     @staticmethod
@@ -71,8 +253,13 @@ class CourseHandler(DbHandlerBase):
 
     @staticmethod
     @DBBridge.query_db
-    def get_by_invite_url(session, invite_url):
+    def get_by_invite_learn_url(session, invite_url):
         return session.query(Course).filter(Course.invite_url == invite_url).one_or_none()
+
+    @staticmethod
+    @DBBridge.query_db
+    def get_by_invite_teach_url(session, invite_url):
+        return session.query(Course).filter(Course.invite_lector_url == invite_url).one_or_none()
 
     @staticmethod
     @DBBridge.query_db
@@ -143,19 +330,22 @@ class CourseHandler(DbHandlerBase):
     @DBBridge.modife_db
     def create(session, username, course_name, course_descr, mode):
         user = UserHandler.get(username)
+        if CourseHandler.get(course_name):
+            return  # course with this name already exist!
 
-        c = None
-        if not CourseHandler.get(course_name):
-            invite_url = str(uuid4()) if mode == Course.PRIVATE else None
-            c = Course(
-                name=course_name,
-                description=course_descr,
-                owner= user.id,
-                mode=mode,
-                state=Course.CREATED,
-                invite_url=invite_url,
-            )
-            session.add(c)
+        invite_url = str(uuid4()) if mode == Course.PRIVATE else None
+        c = Course(
+            name=course_name,
+            description=course_descr,
+            owner=user.id,
+            mode=mode,
+            state=Course.CREATED,
+            invite_url=invite_url,
+            invite_lector_url=str(uuid4()),
+        )
+        session.add(c)
+        session.commit()
+        CourseAccessHandler.add_moderate_access(user, c)
         return c
 
     @staticmethod
@@ -176,10 +366,25 @@ class CourseHandler(DbHandlerBase):
 
     @staticmethod
     @DBBridge.modife_db
-    def associate_with_invite_url(session, username, invite_url):
+    def associate_learn_user(session, username, invite_url):
         # TODO: verify if username CAN be a member of course_name
         user = UserHandler.get(username)
-        course = CourseHandler.get_by_invite_url(invite_url)
+        course = CourseHandler.get_by_invite_learn_url(invite_url)
+        if not CourseMembersHandler.get_member_by_course(course.id, user.id):
+            cm = CourseMembers(
+                course=course.id,
+                member=user.id,
+                assign_type=course.mode,
+            )
+            log.info('Associate user "{}" with course "{}"'.format(username, course.name))
+            session.add(cm)
+            return cm
+
+    @staticmethod
+    @DBBridge.modife_db
+    def associate_teach_user(session, username, invite_url):
+        user = UserHandler.get(username)
+        course = CourseHandler.get_by_invite_teach_url(invite_url)
         if not CourseMembersHandler.get_member_by_course(course.id, user.id):
             cm = CourseMembers(
                 course=course.id,
@@ -194,9 +399,12 @@ class CourseHandler(DbHandlerBase):
 
     @staticmethod
     @DBBridge.modife_db
-    def change_state(session, username, course_name, state):
-        course = CourseHandler.get(course_name)
-        course.state = state
+    def change_state(session, username, course_id, state):
+        user = UserHandler.get(username)
+        course = CourseHandler.get_by_id(course_id)
+        if course.owner == user.id:
+            course.state = state
+            return course
 
 
 class LessonHandler(DbHandlerBase):
@@ -215,9 +423,9 @@ class LessonHandler(DbHandlerBase):
 
     @staticmethod
     @DBBridge.query_db
-    def check_in_course(session, lec_name, course_name):
+    def check_in_course(session, lec_name, course_id):
         return session.query(Lesson).join(Course).filter(
-            Lesson.name == lec_name, Course.name == course_name
+            Lesson.name == lec_name, Course.id == course_id
         ).one_or_none()
 
     @staticmethod
@@ -228,10 +436,9 @@ class LessonHandler(DbHandlerBase):
 
 
     @staticmethod
-    @DBBridge.query_db
-    def get_all_by_course(session, course_name):
+    def get_all_by_course(course_id):
         lessons = []
-        for l in CourseHandler.get(course_name)._lesson:
+        for l in CourseHandler.get_by_id(course_id)._lesson:
             lessons.append(l)
         return lessons
 
@@ -264,15 +471,14 @@ class LessonHandler(DbHandlerBase):
 
     @staticmethod
     @DBBridge.modife_db
-    def create_lesson(session, username, course_name, l_name, l_descr, start_time, dur):
-        course, _, _ = CourseHandler.get_by_owner(course_name, username)
+    def create_lesson(session, course_id, l_name, l_descr, start_time, dur):
         l = Lesson(
             name=l_name,
             description=l_descr,
             start_time=start_time,
             duration=dur,
             state=Lesson.WAITING,
-            course=course.id,
+            course=course_id,
             stream_key=str(uuid4()),
             stream_pw=str(uuid4()).split('-')[-1]  # last string after '-' in ******-****-****-****-******
         )
@@ -281,22 +487,15 @@ class LessonHandler(DbHandlerBase):
 
     @staticmethod
     @DBBridge.modife_db
-    def delete_lesson(session, username, course_name, lesson_name):
-        course, lessons, _ = CourseHandler.get_by_owner(course_name, username)
-        for l in lessons:
-            if l.name == lesson_name:
-                LessonMaterialHandler.delete_by_lesson(l)
-                session.delete(l)
-                return l
+    def delete_lesson(session, lesson):
+        session.delete(lesson)
+        return lesson
 
     @staticmethod
     @DBBridge.modife_db
-    def modify_lesson(session, username, les_id, les_name, les_descr, start_time, dur, course_name):
+    def modify_lesson(session, lesson, les_name, les_descr, start_time, dur, course_name):
+        # course_name always None
         # TODO: check if new data valid
-        # TODO: check owner
-        lesson = session.query(Lesson).filter(Lesson.id == les_id).one()
-        if lesson._course._owner.name != username:
-            return None  # not possible in valid request
         lesson.name = les_name
         lesson.description = les_descr
         lesson.start_time = start_time
@@ -325,15 +524,16 @@ class CourseInvitesHandler(DbHandlerBase):
 
     @staticmethod
     @DBBridge.query_db
-    def get_user_invites(session, username):
+    def get_learn_invites(session, username):
         user = UserHandler.get(username)
-        invites = session.query(CourseInvites).filter(CourseInvites.member == user.id)
+        invites = session.query(CourseInvites).filter(CourseInvites.member == user.id,
+                                                      CourseInvites.action == CourseInvites.LEARN)
         return invites
 
     @staticmethod
     @DBBridge.modife_db
-    def invite_on_decline(session, course_name, invited_user):
-        user_course = CourseInvitesHandler.get_user_invites(invited_user)
+    def learn_invite_on_decline(session, course_name, invited_user):
+        user_course = CourseInvitesHandler.get_learn_invites(invited_user)
         for c in user_course:
             if c._course.name == course_name:
                 session.delete(c)
@@ -342,22 +542,23 @@ class CourseInvitesHandler(DbHandlerBase):
 
     @staticmethod
     @DBBridge.modife_db
-    def invite_on_accept(session, course_name, invited_user):
-        CourseInvitesHandler.invite_on_decline(course_name, invited_user)
+    def learn_invite_on_accept(session, course_name, invited_user):
+        CourseInvitesHandler.learn_invite_on_decline(course_name, invited_user)
         CourseHandler.associate_with_course(invited_user, course_name)
 
     @staticmethod
     @DBBridge.modife_db
-    def create_invite(session, course_name, owner, user_to_invite):
+    def create_learn_invite(session, course_id, owner, user_to_invite):
         # TODO: check if user_to_invite already invited to this course
-        course = CourseHandler.get(course_name)
+        course = CourseHandler.get_by_id(course_id)
+        # TODO: check not only for owner, but also for MODERATE access
         if course._owner.name != owner:
             log.debug('Bad Request')
             return
         user = UserHandler.get(owner)
         if not user:
             log.debug('User with that name doesn`t exist!')
-        i = CourseInvites(course=course.id, member=user.id)
+        i = CourseInvites(course=course.id, member=user.id, action=CourseInvites.LEARN)
         session.add(i)
         return i
 
@@ -368,7 +569,9 @@ class LessonMaterialHandler(DbHandlerBase):
     @DBBridge.query_db
     def check_material(session, username, lesson_id, material_id):
         lesson = LessonHandler.get_by_id(lesson_id)
-        if lesson._course._owner.name != username:
+        access = LessonAccessHandler.check_any_access(username, lesson)
+        if access.access == LessonAccess.VIEW:
+            #  not enough rights
             return False
         if not material_id:
             return True
@@ -506,3 +709,10 @@ class HomeWorkAnswerHandler(DbHandlerBase):
     @DBBridge.modife_db
     def get_all_homework_answers(session, hw_id):
         return session.query(HomeWorkAnswer).filter(HomeWorkAnswer.home_work == hw_id)
+
+
+class OwnerAccess:
+    # this class use to simulate CourseAccess model for course owner
+    BROWSE = 'Browse'
+    MODERATE = 'Moderate'
+    access = MODERATE

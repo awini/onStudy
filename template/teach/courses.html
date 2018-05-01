@@ -5,24 +5,28 @@
 {% block content %}
 
 <br><br><br><br>
-
-<table style="width:50%">
-  <tr>
-    <th>Name</th>
-    <th>Description</th>
-    <th>Mode</th>
-    <th>State</th>
-  </tr>
-    {% for c in courses %}
-  <tr>
-    <td> <a href="teach/manage?course={{ c.name }}">{{ c.name }}</a></td>
-    <td>{{ c.description }}</td>
-    <td>{{ c.mode }}</td>
-    <td>{{ c.state }}</td>
-  </tr>
-    {% end %}
-</table>
-
-
+{% if courses.count() > 0 %}
+  <h4>Courses:</h4>
+  <table style="width:50%">
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Owner</th>
+      <th>Mode</th>
+      <th>State</th>
+    </tr>
+      {% for c in courses %}
+    <tr>
+      <td> <a href="teach/manage?course={{ c.id }}">{{ c.name }}</a></td>
+      <td>{{ c.description }}</td>
+      <td>{{ c._owner.name }}</td>
+      <td>{{ c.mode }}</td>
+      <td>{{ c.state }}</td>
+    </tr>
+      {% end %}
+  </table>
+{% else %}
+  <h4>You don`t have course. Create it!</h4>
+{% end %}
 
 {% end %}

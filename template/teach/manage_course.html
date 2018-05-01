@@ -10,20 +10,32 @@ Name: {{ course.name}}<br>
 Description: {{ course.description }}<br>
 Mode: {{ course.mode }}<br>
 State: {{ course.state }}<br>
-{% if course.mode == course.PRIVATE %}
-<br>Invite url:<a id="inviteUrl" href="/study/register/{{ course.invite_url }}"></a>
-<script type="text/javascript">
-window.onload = function(){
-    document.getElementById("inviteUrl").innerHTML = " " + document.URL + "{{ course.invite_url }}";
-}
-</script>
+Right: {% if user.id == course.owner %} You are owner {% else %} {{ course_access.access }} {% end %}
+<br>
+{% if course_access.access == course_access.MODERATE %}
+    <br>Invite lectors url: <a id="inviteUrlLector" href="/teach/register?key={{ course.invite_lector_url }}"></a>
+    <script type="text/javascript">
+    window.onload = function(){
+        document.getElementById("inviteUrlLector").innerHTML = document.getElementById("inviteUrlLector").href;
+    }
+    </script>
+
+    {% if course.mode == course.PRIVATE %}
+
+    <br>Invite listeners url: <a id="inviteUrlListener" href="/study/register/{{ course.invite_url }}"></a>
+    <script type="text/javascript">
+    window.onload = function(){
+        document.getElementById("inviteUrlListener").innerHTML = document.getElementById("inviteUrlListener").href;
+    }
+    </script>
+    {% end %}
 {% end %}
 
 <br><br>
 
-    {% if lessons %}
+    {% if course._lesson %}
         Lessons: <br><br>
-        {% for l in lessons %}
+        {% for l in course._lesson %}
         <table style="width:70%">
           <tr>
             <th>Name</th>
@@ -32,21 +44,23 @@ window.onload = function(){
             <th>Duration</th>
             <th>Stream key</th>
             <th>State</th>
-            <th>Action</th>
           </tr>
 
           <tr>
-            <td><a href="/teach/lesson?lesson={{ l.id }}">{{ l.name }}</a></td>
+            {% if lesson_access[l.id].access != lesson_access[l.id].VIEW %}
+                <td><a href="/teach/lesson?lesson={{ l.id }}">{{ l.name }}</a></td>
+            {% else %}
+                <td>{{ l.name }}</td>
+            {% end %}
             <td>{{ l.description }}</td>
             <td>{{ l.start_time}}</td>
             <td>{{ l.duration }}</td>
-            <td>{{ l.stream_key}}?pphrs={{ l.stream_pw }}</td>
-            <td>{{ l.state }}</td>
-            {% if l.state == 'Waiting' %}
-                <td> <button type="button" class="removeBtn" value="{{ l.name }}">remove</button> </td>
+            {% if lesson_access[l.id].access != lesson_access[l.id].VIEW %}
+                <td>{{ l.stream_key}}?pphrs={{ l.stream_pw }}</td>
             {% else %}
-                <td> No action</td>
+                <td>{{ l.stream_key}}</td>
             {% end %}
+            <td>{{ l.state }}</td>
           </tr>
         </table>
         <br><br><br>
@@ -55,27 +69,31 @@ window.onload = function(){
         <p> No lessons!!</p>
     {% end %}
 
-<br><br>
-<button type="button" id="addLesson">Add lesson</button>
-
-<br><br>
-    {% if course.state == 'Created' %}
-        <button type="button" id="courseAction" value="Published">Publish </button>
-    {% else %}
-        <button type="button" id="courseAction" value="Interrupted">Cancel Course</button>
-        {% if course.mode == course.PRIVATE %}
-            <br><br><button type="button" id="inviteAction" value="InviteMember">Invite Friend</button>
+{% if course_access.access == course_access.MODERATE %}
+<button onclick="window.location.href='/teach/rights?course={{ course.id }}'"> Manage rights</button>
+{% end %}
+{% if course_access.access == course_access.MODERATE %}
+    <br><br>
+    <button type="button" id="addLesson">Add lesson</button>
+    <br><br>
+        {% if course.state == 'Created' %}
+            <button type="button" id="courseAction" value="Published">Publish </button>
+        {% else %}
+            <button type="button" id="courseAction" value="Interrupted">Cancel Course</button>
+            {% if course.mode == course.PRIVATE %}
+                <br><br><button type="button" id="inviteAction" value="InviteMember">Invite Friend</button>
+            {% end %}
         {% end %}
-    {% end %}
 
-<br><br>
+    <br><br>
+{% end %}
 
 {% if course.mode != course.OPEN %}
-    {% if members %}
+    {% if course._course_member %}
         <p> Registred members: </p>
         <ul>
-          {% for m in members %}
-            <li> {{ m }} </li>
+          {% for m in course._course_member %}
+            <li> {{ m._member.name }} </li>
           {% end %}
         </ul>
     {% else %}
@@ -99,7 +117,7 @@ window.onload = function(){
             <label>Description:</label><br><textarea rows="4" cols="50" id="addLessonDescription" required> Enter description </textarea><br>
             <label>Start time: </label><input type="datetime-local" id="addLessonStartTime" required /><br>
             <label>Duration(minutes): </label><input type="number" min="0" id="addLessonDuration" required /><br>
-            <input type="hidden" id="addLessonCursename" value="{{ course.name }}">
+            <input type="hidden" id="addLessonCurseid" value="{{ course.id }}">
             <input type="submit" value="Add" class="btn btn-default"/>
         </form>
     </div>

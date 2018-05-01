@@ -27,11 +27,7 @@ $(document).ready(function(){
               datatype: 'json',
               success: function(data){
                     alert('Success!');
-                    if (sendData['action'] == 'add') {
-                        window.location = '';
-                    } else {
-                        window.location.reload();
-                    }
+                    window.location.reload();
               },
               error: function(data){
                   alert(data['responseText']);
@@ -50,6 +46,7 @@ $(document).ready(function(){
             return
         }
         var sendData = {
+            lessonid: $(this).val(),
             action: "remove",
             courseName: $("#addLessonCursename").val(),
             lessonName: $(this).val(),
@@ -65,7 +62,7 @@ $(document).ready(function(){
             lessonDescription: $("#addLessonDescription").val(),
             lessonStartTime: $("#addLessonStartTime").val(),
             lessonDuration: $("#addLessonDuration").val(),
-            courseName: $("#addLessonCursename").val(),
+            courseid: $("#addLessonCurseid").val(),
         };
         sendAjax(formData);
     });

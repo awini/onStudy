@@ -22,7 +22,7 @@ $(document).ready(function(){
             return
         }
         var sendData = {
-            courseName: $("#addLessonCursename").val(),
+            courseid: $("#addLessonCurseid").val(),
             action: $(this).val(),
         }
 

@@ -1,7 +1,14 @@
-$(document).ready(function(){
-    'use strict';
-
-    function getCookie(name) {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register to Course {{ course.name}}</title>
+    <script type="text/javascript" src="/js/jquery/jquery.min.js"></script>
+</head>
+<body>
+<script>
+    if (confirm('Are you sure you want to join course "{{ course.name}}" ')) {
+        function getCookie(name) {
         var cookieValue = null;
         if (document.cookie && document.cookie !== '') {
             var cookies = document.cookie.split(';');
@@ -14,44 +21,28 @@ $(document).ready(function(){
             }
         }
         return cookieValue;
-    }
-
-    function collectData(){
-        var courseName = $('#courseName').val();
-        var courseMode = $('#courseMode').val();
-        var courseDescription = $('#courseDescription').val();
-
-        var courseData = {
-            courseName: courseName,
-            courseMode: courseMode,
-            courseDescription: courseDescription,
         }
-
-        return courseData;
-    }
-
-    $("#createCourseForm").submit(function(event) {
-        event.preventDefault();
-        var sendData = collectData();
 
         $.ajaxSetup({
             headers: { "X-CSRFToken": getCookie("_xsrf") }
         });
-
         $.ajax({
               url: "",
               type: "post",
-              data: sendData,
               datatype: 'json',
+              data: {key: "{{course.invite_lector_url}}" },
               success: function(data){
-                    alert('Курс создан!');
-                    window.location.href = '/teach/manage?course=' + JSON.parse(data)['course_id'];
+                    window.location.replace('/teach/manage?course=' + JSON.parse(data)['course_id']);
               },
               error: function(data){
-                  alert(data['responseText']);
+                  alert('Error!');
               },
         });
+    } else {
+        window.location.replace('/');
+    }
 
-    });
+</script>
 
-});
+</body>
+</html>

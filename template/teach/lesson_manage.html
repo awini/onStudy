@@ -8,6 +8,17 @@ Stream key: {{ lesson.stream_key}}?pphrs={{ lesson.stream_pw }}<br>
 State: {{ lesson.state }} <br>
 <br>
 
+{% if access.access == access.MODERATE %}
+<br>
+<form action="/teach/lesson" method="post" onsubmit="return confirm('Are you sure you want to delete lesson?');">
+    {% module xsrf_form_html() %}
+    <input type="hidden" name="action" value="remove">
+    <input type="hidden" name="lessonid" value="{{ lesson.id }}">
+    <input type="submit" value="Remove Lesson" class="btn btn-default"/>
+</form>
+<br>
+{% end %}
+
 <h3 style="color:red">Изменить основные параметры лекции "{{ lesson.name }}":</h3>
 <!--enctype="multipart/form-data"-->
     <form action="/teach/lesson" method="post">

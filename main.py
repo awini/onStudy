@@ -32,7 +32,8 @@ from handlers.MainHandler import MainHandler, WsUpdateMainHandler, RoomHandler, 
 from handlers.auth import LogoutHandler, LoginHandler, RegisterHandler
 from handlers.static_handlers import CssHandler, AssetsLibHandler
 from handlers.course_manager import (CreateCourseHandler, ManageCourseHandler, CoursesHandler, HomeWorkCheckHandler,
-                                     LessonHandler, MaterialManageHandler, HomeWorkManageHandler)
+                                     LessonHandler, MaterialManageHandler, ManageRightsHandler,
+                                     HomeWorkManageHandler, LectorRegisterHandler)
 from handlers.stream_handlers import StreamAuthHandler, StreamUpdateHandler, StreamTstHandler, StreamDoneHandler
 from handlers.study_handlers import (StudyFindHandler, StudyLiveHandler, StudyManageHandler, StudyCourseHandler,
                                      StudyLessonHandler,
@@ -63,6 +64,8 @@ class Application(tornado.web.Application):
             (r"/auth/register", RegisterHandler),
 
             (r"/teach", CoursesHandler),
+            (r"/teach/rights", ManageRightsHandler),
+            (r"/teach/register", LectorRegisterHandler),
             (r"/teach/create", CreateCourseHandler),
             (r"/teach/manage", ManageCourseHandler),
             (r"/teach/lesson", LessonHandler),

@@ -18,10 +18,53 @@ class User(Base):
     password = Column(String(length=60))
     email = Column(String(length=60))
 
+    _lesson_access = relationship('LessonAccess', back_populates='_user')
+    _course_access = relationship('CourseAccess', back_populates='_user')
+
     _course = relationship('Course', back_populates='_owner')
     _course_member = relationship("CourseMembers", back_populates="_member")
     _course_invites = relationship("CourseInvites", back_populates="_member")
     _home_work_answer = relationship("HomeWorkAnswer", back_populates="_source")
+
+
+class CourseAccess(Base):
+    __tablename__ = 'course_access'
+
+    BROWSE = 'Browse'
+    MODERATE = 'Moderate'
+    COURSE_LEVEL = {
+        BROWSE: 'R',
+        MODERATE: 'W',
+    }
+
+    id = Column(Integer, primary_key=True)
+    user = Column(Integer, ForeignKey('user.id'))
+    course = Column(Integer, ForeignKey('course.id'))
+    access = Column(Choice(COURSE_LEVEL))
+
+    _user = relationship('User', back_populates='_course_access')
+    _course = relationship('Course', back_populates='_course_access')
+
+
+class LessonAccess(Base):
+    __tablename__ = 'lesson_access'
+
+    VIEW = 'View'
+    TEACH = 'Teach'  # Include checking homework and setup grade!
+    MODERATE = 'Moderate'
+    LESSON_LEVEL = {
+        TEACH: 'T',
+        MODERATE: 'W',
+        VIEW: 'R'
+    }
+
+    id = Column(Integer, primary_key=True)
+    user = Column(Integer, ForeignKey('user.id'))
+    lesson = Column(Integer, ForeignKey('lesson.id'))
+    access = Column(Choice(LESSON_LEVEL))
+
+    _user = relationship('User', back_populates='_lesson_access')
+    _lesson = relationship('Lesson', back_populates='_lesson_access')
 
 
 class Course(Base):
@@ -54,12 +97,14 @@ class Course(Base):
     owner = Column(Integer, ForeignKey('user.id'))
     mode = Column(Choice(COURSE_MODES))
     state = Column(Choice(COURSE_STATES))
-    invite_url = Column(String(length=36))
+    invite_url = Column(String(length=36))  # for invites learners in private course
+    invite_lector_url = Column(String(length=36))
 
     _owner = relationship("User", back_populates="_course")
-    _lesson = relationship("Lesson", back_populates="_course")
-    _course_member = relationship('CourseMembers', back_populates='_course')
-    _course_invites = relationship("CourseInvites", back_populates="_course")
+    _course_access = relationship('CourseAccess', back_populates='_course', cascade="save-update, merge, delete")
+    _lesson = relationship("Lesson", back_populates="_course", cascade="save-update, merge, delete")
+    _course_member = relationship('CourseMembers', back_populates='_course', cascade="save-update, merge, delete")
+    _course_invites = relationship("CourseInvites", back_populates="_course", cascade="save-update, merge, delete")
 
 
 class Lesson(Base):
@@ -88,6 +133,7 @@ class Lesson(Base):
     stream_key = Column(String(length=36))
     stream_pw  = Column(String(length=12))
 
+    _lesson_access = relationship('LessonAccess', back_populates='_lesson', cascade="save-update, merge, delete")
     _course = relationship("Course", back_populates="_lesson")
     _lesson_material = relationship("LessonMaterial", back_populates="_lesson")
     _home_work = relationship("HomeWork", back_populates="_lesson")
@@ -125,9 +171,17 @@ class CourseMembers(Base):
 class CourseInvites(Base):
     __tablename__ = 'course_invites'
 
+    TEACH = 'Teach'
+    LEARN = 'Learn'
+
+    INVITE_TYPES = {
+        TEACH: 'T',
+        LEARN: 'L',
+    }
     id = Column(Integer, primary_key=True)
     course = Column(Integer, ForeignKey('course.id'))
     member = Column(Integer, ForeignKey('user.id'))
+    action = Column(Choice(INVITE_TYPES))
 
     __table_args__ = UniqueConstraint('course', 'member', name='_course_course_uc'),  # must be tupple!
 

@@ -134,8 +134,16 @@ def fill(session):
                 mode=c_args['mode'],
                 state=c_args['state'],
                 invite_url=invite_url,
+                invite_lector_url=str(uuid4())
             )
             session.add(course)
+            session.commit()
+            course_access = CourseAccess(
+                user=user.id,
+                course=course.id,
+                access=CourseAccess.MODERATE,
+            )
+            session.add(course_access)
             session.commit()
             if 'lessons' not in c_args:
                 continue
@@ -160,6 +168,13 @@ def fill(session):
                     stream_pw=str(uuid4()).split('-')[-1],
                 )
                 session.add(lesson)
+                session.commit()
+                lesson_access = LessonAccess(
+                    user=user.id,
+                    lesson=lesson.id,
+                    access=LessonAccess.MODERATE,
+                )
+                session.add(lesson_access)
                 session.commit()
                 if 'materials' not in l_args:
                     continue

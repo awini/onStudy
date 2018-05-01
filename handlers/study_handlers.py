@@ -60,7 +60,7 @@ class StudyManageHandler(BaseStudyHandler):
 class StudyInviteHandler(BaseStudyHandler):
     @authenticated
     def get(self):
-        invites = self.CourseInvites.get_user_invites(self.get_current_user())
+        invites = self.CourseInvites.get_learn_invites(self.get_current_user())
         return self.render('invite.html', invites=invites)
 
     @authenticated
@@ -69,9 +69,9 @@ class StudyInviteHandler(BaseStudyHandler):
         action = self.get_argument('action')
         course_name = self.get_argument('courseName')
         if action == 'accept':
-            self.CourseInvites.invite_on_accept(course_name, username)
+            self.CourseInvites.learn_invite_on_accept(course_name, username)
         elif action == 'decline':
-            self.CourseInvites.invite_on_decline(course_name, username)
+            self.CourseInvites.learn_invite_on_decline(course_name, username)
         else:
             log.warning('Unknown action {}'.format(action))
             self.set_status(400)
@@ -80,7 +80,7 @@ class StudyInviteHandler(BaseStudyHandler):
 class StudyRegisterHandler(BaseStudyHandler):
     @authenticated
     def get(self, invite_url):
-        course = self.Course.get_by_invite_url(invite_url)
+        course = self.Course.get_by_invite_learn_url(invite_url)
         if course:
             self.render('register.html', course=course)
         else:
@@ -88,9 +88,9 @@ class StudyRegisterHandler(BaseStudyHandler):
 
     @authenticated
     def post(self, invite_url):
-        course = self.Course.get_by_invite_url(invite_url)
+        course = self.Course.get_by_invite_learn_url(invite_url)
         if course:
-            assoc = self.Course.associate_with_invite_url(self.get_current_user(), invite_url)
+            assoc = self.Course.associate_learn_user(self.get_current_user(), invite_url)
             if not assoc:
                 self.set_status(400)
         else:

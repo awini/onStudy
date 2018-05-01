@@ -1,0 +1,76 @@
+{% extends "../base.html" %}
+
+{% block title %}Right Managment{% end %}
+
+{% block content %}
+
+<h3> Manage rights for course {{ course_right[0]._course.name }} </h3>
+<table style="width:70%" course="{{course_right[0].course}}" id="courseRights">
+          <tr>
+            <th>Username</th>
+            <th>Current</th>
+            <th>New</th>
+            <th>Lesson rights</th>
+          </tr>
+
+
+        {% for r in course_right %}
+            {% if r._course.owner != r.user %}
+                <tr>
+                    <td> {{ r._user.name }}</td>
+                    <td> {{ r.access }}</td>
+                    <td>
+                        <select class="selectedCourseRights" user="{{ r._user.name }}">
+                            <option> Remove </option>
+                            {% for access_type in r.COURSE_LEVEL %}
+                                {% if r.access == access_type %}
+                                    <option selected> {{ access_type }} </option>
+                                {% else %}
+                                    <option> {{ access_type }} </option>
+                                {% end %}
+                            {% end %}
+                        </select>
+                    </td>
+                    <td><a href="#" class="rightView" value="{{ r._user.name }}">view</a></td>
+                </tr>
+            {% end %}
+        {% end %}
+</table>
+
+<button type="button" id="applyCourseBtn">Apply</button>
+
+<div class="modal fade" id="lessonRights" role="dialog">
+<div class="modal-dialog">
+<div class="modal-content">
+    <div class="modal-header">
+        <h4 class="modal-title">Manage Lessons Rights</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+    </div>
+    <div class="modal-body">
+        <table style="width:70%" id="lessonsRights">
+            <thead>
+                <tr>
+                    <th>Lesson Name</th>
+                    <th>Current</th>
+                    <th>New</th>
+                </tr>
+            </thead>
+            <tbody id="lessonRightsTbody">
+
+            </tbody>
+        </table>
+        <button type="button" id="applyLessonBtn">Apply</button>
+        <p>WARNING! "TEACH" right use for streamers - participant with this right will be show in lesson lector name! </p>
+    </div>
+</div>
+</div>
+</div><!--End of Modal-->
+
+<select hidden="hidden" id="selectLesRights">
+    <option value="View">View</option>
+    <option value="Teach">Teach</option>
+    <option value="Moderate">Moderate</option>
+</select>
+
+<script type="text/javascript" src="/static/js/course_manager/rights_manage.js"></script>
+{% end %}
