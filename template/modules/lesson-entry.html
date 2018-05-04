@@ -1,16 +1,18 @@
 <a href="/study/lesson/{{ lesson.id }}" class="list-group-item list-group-item-action flex-column align-items-start">
-    
-    <div class="d-flex w-100 justify-content-between">
+
+    <img src="/static/img/student-with-notebook.gif" style="height:100px; float:left;margin-right:-25%;">
+
+    <div class="d-flex w-75 justify-content-between" style="margin-left:25%;">
         <h5 class="mb-1">{{ lesson.name }} </h5>
         <small> {{ lesson.duration }} minutes / start at {{ lesson.start_time_in_format() }} / {{ lesson.state }}</small>
     </div>
 
-    <div class="d-flex w-100 justify-content-between align-items-center">
+    <div class="d-flex w-75 justify-content-between align-items-center" style="margin-left:25%;">
         <span class="mb-1 ">{{ lesson.description }}</span>
         <small>{{ lesson._course.name }}</small>
     </div>
 
-    <div class="d-flex w-100 justify-content-between align-items-end">
+    <div class="d-flex w-75 justify-content-between align-items-end" style="margin-left:25%;">
         <small>{{ lesson._course._owner.name }}</small>
         <button class="btn">Watch Now!</button>
     </div>

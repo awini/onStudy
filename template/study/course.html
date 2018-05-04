@@ -6,16 +6,20 @@
 
 <div class="open-lessons-jumbotron mt-3">
     <div class="container">
-        <div class="row">
-            <h2>{{ course.name }}</h2>
-            <p class="lead mt-3 ml-3"><a class='float-right'> / {{ course._owner.name }}</a></p>
-        </div>
-        <div class="row">
-            <p class="lead">{{ course.description }} </p>
-        </div>
-        <div class="row">
-            <p class="lead">{{ course.mode }}</p>
+        <div class="row flex-column align-items-start">
+            <img src="/static/img/student-with-notebook.gif" style="width:150px;float:left;margin-right:-25%;margin-bottom:-150px;">
+
+            <div class="d-flex w-75 justify-content-between" style="margin-left:25%;">
+                <h2>{{ course.name }}</h2>
+                <p class="lead mt-3 ml-3"><a class='float-right'> / {{ course._owner.name }}</a></p>
+            </div>
+            <div class="d-flex w-75 justify-content-between" style="margin-left:25%;">
+                <p class="lead">{{ course.description }} </p>
+            </div>
+            <div class="d-flex w-75 justify-content-between" style="margin-left:25%;">
+                <p class="lead">{{ course.mode }}</p>
             <p class="lead ml-3">{{ course.state }}</p>
+            </div>
         </div>
     </div>
     <hr>
