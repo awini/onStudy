@@ -24,12 +24,8 @@
         <div class="row">
             {% for less in lessons %}
             <div class="col-md-4 flex-column align-items-start">
+                
                 <img src="/static/img/student-with-notebook.gif" style="height:100px; float:left; margin-right:10px;">
-
-                <!--div class="d-flex w-50 justify-content-between align-items-end" style="margin-left:25%;">
-                    <small>tst</small>
-                    <button class="btn">Watch Now!</button>
-                </div-->
 
                 <div class="d-flex w-50 justify-content-between align-items-end" style="margin-left:25%;">
                     <small>{{ less.start_time_in_format() }}</small>
@@ -42,15 +38,6 @@
                     <a href="/study/course/{{ less._course.id }}">{{ less._course.name }}</a>
                 </div>
 
-                <!--div class="d-flex w-50 justify-content-between align-items-end" style="margin-left:25%;">
-
-                    <a href="/study/course/{{ less._course.id }}">{{ less._course.name }}</a>
-                    <small><a class='float-right'> / {{ less._course._owner.name }}</a></small>
-
-                </div>
-
-                <p><span class="h4">{{ less.name }}</span> <span class="lead float-right">{{ less.start_time_in_format() }}</span></p>
-                <p class="lead"><a href="/study/course/{{ less._course.id }}">{{ less._course.name }}</a> <a class='float-right'> / {{ less._course._owner.name }}</a></p-->
             </div>
             {% end %}
         </div>
