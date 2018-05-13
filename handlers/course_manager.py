@@ -12,11 +12,13 @@ log = getLogger(__name__)
 
 
 class BaseCourseHandler(BaseHandler):
+
     def get_template_path(self):
         return sets.TEMPLATE_PATH + 'teach'
 
 
 class CreateCourseHandler(BaseCourseHandler):
+
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
         return self.render('create_course.html', modes=Course.COURSE_MODES)
@@ -97,6 +99,7 @@ class CoursesHandler(BaseCourseHandler):
         courses = self.Course.get_all_by_partner(username)
         # return self.render('courses.html', owner_courses=owner_courses, other_course=other_course )
         return self.render('courses.html', courses=courses)
+
 
 class LessonHandler(BaseCourseHandler):
 
@@ -265,6 +268,7 @@ class HomeWorkManageHandler(BaseCourseHandler):
 
 
 class HomeWorkCheckHandler(BaseCourseHandler):
+
     @tornado.web.authenticated
     def get(self):
         # TODO: check owner
@@ -287,6 +291,7 @@ class HomeWorkCheckHandler(BaseCourseHandler):
 
 
 class LectorRegisterHandler(BaseCourseHandler):
+
     @tornado.web.authenticated
     def get(self):
         key = self.get_argument('key')
@@ -318,6 +323,7 @@ class LectorRegisterHandler(BaseCourseHandler):
 
 
 class ManageRightsHandler(BaseCourseHandler):
+    
     def __init__(self, *args, **kwargs):
         self.ACTIONS = {
             'showLessons': self.__show_lessons,

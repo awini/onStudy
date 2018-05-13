@@ -20,6 +20,7 @@ class MainHandler(BaseHandler):
         return self.render("main.html", lessons=lessons)
 
 class WsUpdateMainHandler(tornado.websocket.WebSocketHandler):
+
     all_waiters = set()
 
     def get_compression_options(self):
@@ -56,6 +57,7 @@ class WsUpdateMainHandler(tornado.websocket.WebSocketHandler):
 
 
 class AboutHandler(BaseHandler):
+    
     @tornado.web.authenticated
     def get(self):
         return self.render("about.html")

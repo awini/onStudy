@@ -7,6 +7,7 @@ from settings import sets
 
 
 class LoginHandler(BaseHandler):
+
     def get(self):
         self.render('login.html', msg='')
 
@@ -36,6 +37,7 @@ class LoginHandler(BaseHandler):
 
 
 class LogoutHandler(BaseHandler):
+
     @tornado.web.authenticated
     def get(self):
         self.clear_cookie("user")
@@ -43,6 +45,7 @@ class LogoutHandler(BaseHandler):
 
 
 class RegisterHandler(BaseHandler):
+    
     def get(self):
         self.render('register.html', msg='')
 

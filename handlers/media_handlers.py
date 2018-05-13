@@ -6,6 +6,7 @@ log = getLogger(__name__)
 
 
 class MaterialHandler(BaseHandler):
+    
     @authenticated
     def get(self, file_name):
         # TODO: materials for private and closed courses can be downloaded only by users, that registred on this courses

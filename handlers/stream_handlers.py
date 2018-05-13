@@ -12,6 +12,7 @@ log = getLogger(__name__)
 
 
 class StreamAuthHandler(BaseHandler):
+    
     user_keys = {}
 
     @staticmethod

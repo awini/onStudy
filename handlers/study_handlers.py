@@ -47,12 +47,13 @@ class StudyFindHandler(BaseStudyHandlerClear):
             self.set_status(400)
 
 
-class StudyManageHandler(BaseStudyHandler):
+class StudyManageHandler(BaseStudyHandlerClear):
 
     @authenticated
     def get(self):
-        user_in = self.CourseMembers.get_all_study_course(self.get_current_user())
-        return self.render('manage.html', user_in=user_in)
+        user = self.get_current_user()
+        user_in = self.CourseMembers.get_all_study_course(user)
+        return self.render('study/manage.html', user_in=user_in, user=user)
 
     @authenticated
     def post(self):

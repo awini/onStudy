@@ -4,6 +4,45 @@
 
 {% block content %}
 
+{% if user_in %}
+<div class="open-lessons-jumbotron mt-3">
+  <div class="container">
+      <div class="row">
+
+          <div class="col-md-3">
+              <img src="/static/img/student-with-notebook.gif" style="width:100%;">
+          </div>
+
+          <div class="col-md-9 flex-column align-items-start">
+              <div class="d-flex w-100 justify-content-between">
+                  <h2>{{ user }}</h2>
+              </div>
+          </div>
+      </div>
+  </div>
+  <hr>
+  <div class="container">
+      <div class="row">
+          {% if user_in %}
+            {% for cm in user_in %}
+              
+              {% module CursEntry(curs=cm._course) %}
+
+              {% for lesson in cm._course._lesson %}
+                  {% module LessonEntry(lesson) %}
+              {% end %}
+            {% end %}
+          {% else %}
+          You don`t have any study course.
+          {% end %}
+      </div>
+  </div>
+</div>
+{% else %}
+<p>You don`t have any study course</p>
+{% end %}
+
+
 <br><br><br><br>
 {% if user_in %}
 <p>Study Courses:</p>

@@ -13,3 +13,9 @@ class LessonEntry(tornado.web.UIModule):
     def render(self, lesson, show_comments=False):
         return self.render_string(
             "modules/lesson-entry.html", lesson=lesson, show_comments=show_comments)
+
+class LessonMainEntry(tornado.web.UIModule):
+
+    def render(self, lesson, show_comments=False):
+        return self.render_string(
+            "modules/lesson-main-entry.html", lesson=lesson, show_comments=show_comments)
