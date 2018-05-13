@@ -31,6 +31,7 @@ class StudyLiveHandler(BaseStudyHandlerClear):
 
 
 class StudyFindHandler(BaseStudyHandlerClear):
+
     @authenticated
     def get(self):
         open_courses, closed_courses = self.Course.get_all_course(self.get_current_user())
@@ -47,6 +48,7 @@ class StudyFindHandler(BaseStudyHandlerClear):
 
 
 class StudyManageHandler(BaseStudyHandler):
+
     @authenticated
     def get(self):
         user_in = self.CourseMembers.get_all_study_course(self.get_current_user())
@@ -58,6 +60,7 @@ class StudyManageHandler(BaseStudyHandler):
 
 
 class StudyInviteHandler(BaseStudyHandler):
+
     @authenticated
     def get(self):
         invites = self.CourseInvites.get_learn_invites(self.get_current_user())
@@ -78,6 +81,7 @@ class StudyInviteHandler(BaseStudyHandler):
 
 
 class StudyRegisterHandler(BaseStudyHandler):
+
     @authenticated
     def get(self, invite_url):
         course = self.Course.get_by_invite_learn_url(invite_url)
@@ -114,6 +118,7 @@ class StudyCourseHandler(BaseStudyHandlerClear):
 
     def render_course(self, course):
         return self.render('study/course.html', course=course)
+
 
 class StudyLessonHandler(BaseStudyHandlerClear):
 
